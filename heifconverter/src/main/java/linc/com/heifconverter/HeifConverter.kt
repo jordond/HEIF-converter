@@ -23,10 +23,9 @@ import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-
-object HeifConverter{
-
-    private lateinit var context: Context
+class HeifConverter(
+    private val context: Context,
+) {
 
     private var pathToHeicFile: String? = null
     private var url: String? = null
@@ -42,11 +41,8 @@ object HeifConverter{
 
     private var fromDataType = InputDataType.NONE
 
-    fun useContext(context: Context) : HeifConverter {
-        this.context = context
-        HeifReader.initialize(HeifConverter.context)
+    init {
         initDefaultValues()
-        return this
     }
 
     fun fromFile(pathToFile: String) : HeifConverter {
@@ -249,4 +245,16 @@ object HeifConverter{
         BYTE_ARRAY, NONE
     }
 
+    companion object {
+
+        @Deprecated(
+            "Use new builder style",
+            ReplaceWith("HeifConverter.with(context)"),
+        )
+        fun useContext(context: Context) = with(context)
+
+        fun with(context: Context) = HeifConverter(context).apply {
+            HeifReader.initialize(context)
+        }
+    }
 }
