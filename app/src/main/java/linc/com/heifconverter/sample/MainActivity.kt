@@ -2,6 +2,7 @@ package linc.com.heifconverter.sample
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
@@ -24,7 +25,8 @@ class MainActivity : AppCompatActivity() {
                 .saveFileWithName("Image_Converted_Name")
                 .saveResultImage(true)
                 .convert {
-                    println(it[HeifConverter.Key.IMAGE_PATH] as String)
+                    val path = it[HeifConverter.Key.IMAGE_PATH] as String
+                    Log.i("MainActivity", "Saved bitmap to: $path")
                     resultImage.setImageBitmap((it[HeifConverter.Key.BITMAP] as Bitmap))
                 }
         }
