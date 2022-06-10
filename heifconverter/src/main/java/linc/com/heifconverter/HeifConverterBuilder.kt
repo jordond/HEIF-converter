@@ -1,9 +1,7 @@
 package linc.com.heifconverter
 
 import android.content.Context
-import android.os.Environment
 import androidx.annotation.DrawableRes
-import androidx.core.content.ContextCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -14,12 +12,7 @@ import java.io.InputStream
 @Suppress("MemberVisibilityCanBePrivate")
 class HeifConverterBuilder internal constructor(private val context: Context) {
 
-    private var options = HeifConverter.Options(
-        pathToSaveDirectory = ContextCompat.getExternalFilesDirs(
-            context,
-            Environment.DIRECTORY_DCIM
-        )[0].path,
-    )
+    private var options = HeifConverter.Options.default(context)
 
     fun fromFile(pathToFile: String) = apply {
         if (!File(pathToFile).exists()) {

@@ -3,7 +3,9 @@ package linc.com.heifconverter
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Build
+import android.os.Environment
 import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -99,6 +101,16 @@ class HeifConverter internal constructor(
     ) {
 
         val outputFileName = "${convertedFileName}${outputFormat}"
+
+        companion object {
+
+            internal fun default(context: Context) = Options(
+                pathToSaveDirectory = ContextCompat.getExternalFilesDirs(
+                    context,
+                    Environment.DIRECTORY_DCIM
+                )[0].path,
+            )
+        }
     }
 
     object Format {
