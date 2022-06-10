@@ -1,17 +1,41 @@
-*.iml
+# built application files
+*.apk
+*.ap_
 *.aab
-.gradle
-/local.properties
-/secrets.properties
-/API\ Key
-/.idea/caches/build_file_checksums.ser
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/vcs.xml
-.idea/gradle.xml
-.idea/misc.xml
+
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# generated files
+bin/
+gen/
+out/
+build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+secrets.properties
+
+# Eclipse project files
+.classpath
+.project
+
+# Windows thumbnail db
 .DS_Store
-/build
-/captures
+
+# IDEA/Android Studio project files
+*.iml
+.idea/*
+!.idea/copyright
+
+# Gradle cache
+.gradle
+
+# Android Studio captures folder
+captures/
+
 .externalNativeBuild
+API\ Key
