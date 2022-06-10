@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.ImageFormat
-import android.graphics.PixelFormat
 import android.media.*
 import android.os.SystemClock
 import android.renderscript.Allocation
@@ -28,7 +27,6 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.channels.Channels
 import java.util.*
-import kotlin.coroutines.CoroutineContext
 
 /**
  * HEIF(High Efficiency Image Format) reader
@@ -40,9 +38,10 @@ internal object HeifReader {
 
     /**
      * input data size limitation for safety.
+     *
+     * 20MB
      */
-    private const val LIMIT_FILESIZE = 20 * 1024 * 1024 // 20[MB]
-        .toLong()
+    private const val LIMIT_FILESIZE = (20 * 1024 * 1024).toLong()
     private var mRenderScript: RenderScript? = null
     private var mCacheDir: File? = null
     private var mDecoderName: String? = null
@@ -135,7 +134,7 @@ internal object HeifReader {
      * @param pathName complete path name for the file to be decoded.
      * @return The decoded bitmap, or null if the image could not be decoded.
      */
-    suspend fun decodeFile(pathName: String?): Bitmap? {
+    suspend fun decodeFile(pathName: String): Bitmap? {
         assertPrecondition()
         try {
             val file = File(pathName)
@@ -181,10 +180,10 @@ internal object HeifReader {
      * This method save input stream to temporary file on cache directory, because HEIF data
      * structure requires multi-pass parsing.
      *
-     * @param is The input stream that holds the raw data to be decoded into a bitmap.
+     * @param `is` The input stream that holds the raw data to be decoded into a bitmap.
      * @return The decoded bitmap, or null if the image could not be decoded.
      */
-    suspend fun decodeStream(`is`: InputStream): Bitmap? {
+    suspend fun decodeStream(inputStream: InputStream): Bitmap? {
         assertPrecondition()
         return try {
             // write stream to temporary file
@@ -195,7 +194,7 @@ internal object HeifReader {
                 val buf = ByteArray(4096)
                 var totalLength = 0
                 var len: Int
-                while (`is`.read(buf).also { len = it } > 0) {
+                while (inputStream.read(buf).also { len = it } > 0) {
                     fos.write(buf, 0, len)
                     totalLength += len
                     if (LIMIT_FILESIZE < totalLength) {
@@ -363,6 +362,7 @@ internal object HeifReader {
     ): T? {
         for (box in container) {
             if (clazz.isInstance(box)) {
+                @Suppress("UNCHECKED_CAST")
                 return box as T
             }
         }
@@ -427,7 +427,7 @@ internal object HeifReader {
         }
     }
 
-    private suspend fun renderHevcImage(
+    private fun renderHevcImage(
         bitstream: ByteBuffer,
         info: ImageInfo,
         surface: Surface
@@ -475,7 +475,7 @@ internal object HeifReader {
         Log.i(TAG, "HEVC decoding elapsed=" + (endTime - beginTime) / 1000000f + "[msec]")
     }
 
-    private suspend fun convertYuv420ToBitmap(image: Image?): Bitmap {
+    private fun convertYuv420ToBitmap(image: Image?): Bitmap {
         val rs = mRenderScript
         val width = image!!.width
         val height = image.height
@@ -540,7 +540,7 @@ internal object HeifReader {
         return bmp
     }
 
-    private suspend fun convertRgb565ToBitmap(image: Image?): Bitmap {
+    private fun convertRgb565ToBitmap(image: Image?): Bitmap {
         val bmp =
             Bitmap.createBitmap(image!!.width, image.height, Bitmap.Config.RGB_565)
         val planes = image.planes
@@ -556,6 +556,5 @@ internal object HeifReader {
         var length = 0
     }
 
-    private class FormatFallbackException internal constructor(ex: Throwable?) :
-        Exception(ex)
+    private class FormatFallbackException(ex: Throwable?) : Exception(ex)
 }
