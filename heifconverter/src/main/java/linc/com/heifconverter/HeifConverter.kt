@@ -1,95 +1,115 @@
 package linc.com.heifconverter
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.os.Build
 import android.os.Environment
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
-import linc.com.heifconverter.util.createBitmap
+import linc.com.heifconverter.util.Converter
 import java.io.File
-import java.io.FileOutputStream
+import java.io.FileNotFoundException
+import java.io.InputStream
 import java.util.*
-import kotlin.coroutines.resume
 
-class HeifConverter internal constructor(
-    private val context: Context,
-    private val options: Options,
-) {
+@Suppress("MemberVisibilityCanBePrivate", "unused")
+class HeifConverter internal constructor(private val context: Context) {
+
+    private var options = Options.default(context)
+
+    private val converter: Converter
+        get() = Converter(context = context, options)
+
+    fun fromFile(pathToFile: String) = apply {
+        if (!File(pathToFile).exists()) {
+            throw FileNotFoundException("HEIC file not found! $pathToFile")
+        }
+
+        update { copy(inputData = InputData.File(pathToFile)) }
+    }
+
+    fun fromFile(file: File) = fromFile(file.absolutePath)
+
+    fun fromInputStream(inputStream: InputStream) = apply {
+        update { copy(inputData = InputData.InputStream(inputStream)) }
+    }
+
+    fun fromResource(@DrawableRes resId: Int) = apply {
+        val isResValid = context.resources.getIdentifier(
+            context.resources.getResourceName(resId),
+            "drawable",
+            context.packageName,
+        ) != 0
+
+        if (!isResValid) {
+            throw FileNotFoundException("Resource not found!")
+        }
+
+        update { copy(inputData = InputData.Resources(resId)) }
+    }
+
+    fun fromUrl(heicImageUrl: String) = apply {
+        update { copy(inputData = InputData.Url(heicImageUrl)) }
+    }
+
+    fun fromByteArray(data: ByteArray) = apply {
+        if (data.isEmpty()) {
+            throw FileNotFoundException("Empty byte array!")
+        }
+
+        update { copy(inputData = InputData.ByteArray(data)) }
+    }
+
+    fun withOutputFormat(format: String) = apply {
+        update { copy(outputFormat = format) }
+    }
+
+    fun withOutputQuality(quality: Int) = apply {
+        update {
+            copy(outputQuality = quality.coerceIn(0..100))
+        }
+    }
+
+    fun saveResultImage(saveResultImage: Boolean) = apply {
+        update { copy(saveResultImage = saveResultImage) }
+    }
+
+    fun saveFileWithName(convertedFileName: String) = apply {
+        update { copy(convertedFileName = convertedFileName) }
+    }
+
+    @Deprecated(
+        "Will be added in future",
+        ReplaceWith("", ""),
+        DeprecationLevel.HIDDEN,
+    )
+    fun saveToDirectory(pathToDirectory: String) = apply {
+        if (!File(pathToDirectory).exists()) {
+            throw FileNotFoundException("Directory not found!")
+        }
+
+        update { copy(pathToSaveDirectory = pathToDirectory) }
+    }
 
     @Deprecated(
         "You should really use convertBlocking or convert {}",
         ReplaceWith("convert { }"),
     )
-    fun convert(): Job {
-        return convert {}
-    }
+    fun convert(): Job = converter.convert()
 
-    /**
-     * convert using coroutines to get result synchronously
-     * @return map of [Key] to values
-     */
     suspend fun convertBlocking(
         scope: CoroutineScope = CoroutineScope(Dispatchers.Main),
-    ): Map<String, Any?> = suspendCancellableCoroutine { cont ->
-        val job = convert(scope) { result -> cont.resume(result) }
-
-        cont.invokeOnCancellation { job.cancel() }
-    }
+    ): Map<String, Any?> = converter.convertBlocking(scope)
 
     fun convert(
         scope: CoroutineScope = CoroutineScope(Dispatchers.Main),
         block: (result: Map<String, Any?>) -> Unit,
-    ): Job = scope.launch(Dispatchers.Main) {
-        val bitmap = withContext(Dispatchers.IO) {
-            options.inputData.createBitmap(context)
-        } ?: return@launch block(createResultMap(null))
+    ): Job = converter.convert(scope, block)
 
-        // Return early if we don't need to save the bitmap
-        if (!options.saveResultImage || options.pathToSaveDirectory == null) {
-            return@launch block(createResultMap(bitmap))
-        }
-
-        // Figure out where to save it
-        val directoryToSave = File(options.pathToSaveDirectory)
-        val outputFile = File(directoryToSave, options.outputFileName)
-
-        // Save the bitmap and trigger callback
-        val savedFilePath = bitmap.saveToFile(outputFile)
-        block(createResultMap(bitmap, savedFilePath))
+    private fun update(block: Options.() -> Options) {
+        options = options.run(block)
     }
-
-    private suspend fun Bitmap.saveToFile(outputFile: File): String = withContext(Dispatchers.IO) {
-        val result = runCatching {
-            FileOutputStream(outputFile).use { outputStream ->
-                val format = useFormat(options.outputFormat)
-                compress(format, options.outputQuality, outputStream)
-            }
-        }
-
-        val saved = result.getOrThrow()
-        if (saved) outputFile.absolutePath
-        else throw RuntimeException("Unable to save bitmap to ${outputFile.absolutePath}")
-    }
-
-    private fun useFormat(format: String) = when (format) {
-        Format.WEBP ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Bitmap.CompressFormat.WEBP_LOSSY
-            else @Suppress("DEPRECATION") Bitmap.CompressFormat.WEBP
-        Format.PNG -> Bitmap.CompressFormat.PNG
-        else -> Bitmap.CompressFormat.JPEG
-    }
-
-    private fun createResultMap(bitmap: Bitmap?, path: String? = null) = mapOf(
-        Key.BITMAP to bitmap,
-        Key.IMAGE_PATH to path,
-    )
 
     internal data class Options(
         val inputData: InputData = InputData.None,
@@ -152,7 +172,7 @@ class HeifConverter internal constructor(
 
 
         // default pathToSaveDirectory:
-        fun with(context: Context) = HeifConverterBuilder(context).apply {
+        fun with(context: Context) = HeifConverter(context).apply {
             HeifReader.initialize(context)
         }
     }
