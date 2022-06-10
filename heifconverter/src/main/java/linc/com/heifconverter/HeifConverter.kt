@@ -26,13 +26,13 @@ class HeifConverter internal constructor(private val context: Context) {
             throw FileNotFoundException("HEIC file not found! $pathToFile")
         }
 
-        update { copy(inputData = InputData.File(pathToFile)) }
+        update { copy(inputDataType = InputDataType.File(pathToFile)) }
     }
 
     fun fromFile(file: File) = fromFile(file.absolutePath)
 
     fun fromInputStream(inputStream: InputStream) = apply {
-        update { copy(inputData = InputData.InputStream(inputStream)) }
+        update { copy(inputDataType = InputDataType.InputStream(inputStream)) }
     }
 
     fun fromResource(@DrawableRes resId: Int) = apply {
@@ -46,11 +46,11 @@ class HeifConverter internal constructor(private val context: Context) {
             throw FileNotFoundException("Resource not found!")
         }
 
-        update { copy(inputData = InputData.Resources(resId)) }
+        update { copy(inputDataType = InputDataType.Resources(resId)) }
     }
 
     fun fromUrl(heicImageUrl: String) = apply {
-        update { copy(inputData = InputData.Url(heicImageUrl)) }
+        update { copy(inputDataType = InputDataType.Url(heicImageUrl)) }
     }
 
     fun fromByteArray(data: ByteArray) = apply {
@@ -58,7 +58,7 @@ class HeifConverter internal constructor(private val context: Context) {
             throw FileNotFoundException("Empty byte array!")
         }
 
-        update { copy(inputData = InputData.ByteArray(data)) }
+        update { copy(inputDataType = InputDataType.ByteArray(data)) }
     }
 
     fun withOutputFormat(format: String) = apply {
@@ -112,7 +112,7 @@ class HeifConverter internal constructor(private val context: Context) {
     }
 
     internal data class Options(
-        val inputData: InputData = InputData.None,
+        val inputDataType: InputDataType = InputDataType.None,
         val outputQuality: Int = 100,
         val saveResultImage: Boolean = false,
         val outputFormat: String = Format.JPEG,
@@ -144,22 +144,13 @@ class HeifConverter internal constructor(private val context: Context) {
         const val IMAGE_PATH = "path_to_converted_heic"
     }
 
-    internal sealed class InputData(val type: InputDataType) {
-        class File(val data: String) : InputData(InputDataType.FILE)
-        class Url(val data: String) : InputData(InputDataType.URL)
-        class Resources(@DrawableRes val data: Int) : InputData(InputDataType.RESOURCES)
-        class InputStream(val data: java.io.InputStream) : InputData(InputDataType.INPUT_STREAM)
-        class ByteArray(val data: kotlin.ByteArray) : InputData(InputDataType.BYTE_ARRAY)
-        object None : InputData(InputDataType.NONE)
-    }
-
-    internal enum class InputDataType {
-        FILE,
-        URL,
-        RESOURCES,
-        INPUT_STREAM,
-        BYTE_ARRAY,
-        NONE,
+    internal sealed class InputDataType {
+        class File(val data: String) : InputDataType()
+        class Url(val data: String) : InputDataType()
+        class Resources(@DrawableRes val data: Int) : InputDataType()
+        class InputStream(val data: java.io.InputStream) : InputDataType()
+        class ByteArray(val data: kotlin.ByteArray) : InputDataType()
+        object None : InputDataType()
     }
 
     companion object {

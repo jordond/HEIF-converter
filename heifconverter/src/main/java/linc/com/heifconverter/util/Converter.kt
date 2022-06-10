@@ -40,7 +40,7 @@ internal class Converter constructor(
         block: (result: Map<String, Any?>) -> Unit,
     ): Job = scope.launch(Dispatchers.Main) {
         val bitmap = withContext(Dispatchers.IO) {
-            options.inputData.createBitmap(context)
+            options.inputDataType.createBitmap(context)
         } ?: return@launch block(createResultMap(null))
 
         // Return early if we don't need to save the bitmap
