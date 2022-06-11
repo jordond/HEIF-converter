@@ -4,13 +4,13 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.os.Environment
 import androidx.annotation.DrawableRes
+import androidx.annotation.IntRange
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import linc.com.heifconverter.HeifConverter.Companion.create
 import linc.com.heifconverter.HeifConverter.InputDataType.None
-import linc.com.heifconverter.util.Converter
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.InputStream
@@ -43,32 +43,43 @@ class HeifConverter internal constructor(private val context: Context) {
         }
 
     /**
-     * Set the input HEIC file from an absolute filepath on the device.
+     * Use an absolute file path for loading the HEIC file.
      *
      * @param[pathToFile] Absolute filepath to the image.
      * @throws FileNotFoundException if [pathToFile] doesn't point to an accessible existing file.
      */
-    fun fromFile(pathToFile: String) = apply {
-        if (!File(pathToFile).exists()) {
-            throw FileNotFoundException("HEIC file not found! $pathToFile")
-        }
-
-        update { copy(inputDataType = InputDataType.File(pathToFile)) }
-    }
+    fun fromFile(pathToFile: String) = fromFile(File(pathToFile))
 
     /**
-     * Set the input HEIC file from a [File] object.
+     * Use a [File] object for loading the HEIC file.
      *
      * @see fromFile
      * @param[file] [File] object pointing to the HEIC image.
      * @throws FileNotFoundException if [file] doesn't point to an accessible existing file.
      */
-    fun fromFile(file: File) = fromFile(file.absolutePath)
+    fun fromFile(file: File) = apply {
+        if (!file.exists()) {
+            throw FileNotFoundException("HEIC file not found! ${file.absolutePath}")
+        }
 
-    fun fromInputStream(inputStream: InputStream) = apply {
-        update { copy(inputDataType = InputDataType.InputStream(inputStream)) }
+        updateOptions { copy(inputDataType = InputDataType.File(file)) }
     }
 
+    /**
+     * Use an [InputStream] for loading the HEIC file.
+     *
+     * @param[inputStream] [InputStream] for HEIC image.
+     */
+    fun fromInputStream(inputStream: InputStream) = apply {
+        updateOptions { copy(inputDataType = InputDataType.InputStream(inputStream)) }
+    }
+
+    /**
+     * Load the HEIC input from the app's resources.
+     *
+     * @param[resId] A [DrawableRes] ID for your HEIC image.
+     * @throws FileNotFoundException if the [resId] is not valid.
+     */
     fun fromResource(@DrawableRes resId: Int) = apply {
         val isResValid = context.resources.getIdentifier(
             context.resources.getResourceName(resId),
@@ -80,37 +91,88 @@ class HeifConverter internal constructor(private val context: Context) {
             throw FileNotFoundException("Resource not found!")
         }
 
-        update { copy(inputDataType = InputDataType.Resources(resId)) }
+        updateOptions { copy(inputDataType = InputDataType.Resources(resId)) }
     }
 
+    /**
+     * Set the input HEIC file to a URL.
+     *
+     * This URL will be used to download the HEIC then convert it.
+     *
+     * @param[heicImageUrl] URL pointing to an HEIC file.
+     */
     fun fromUrl(heicImageUrl: String) = apply {
-        update { copy(inputDataType = InputDataType.Url(heicImageUrl)) }
+        updateOptions { copy(inputDataType = InputDataType.Url(heicImageUrl)) }
     }
 
+    /**
+     * Use a [ByteArray] as the source for conversion.
+     *
+     * @param[data] [ByteArray] containing the HEIC data.
+     * @throws FileNotFoundException if [data] is empty.
+     */
     fun fromByteArray(data: ByteArray) = apply {
         if (data.isEmpty()) {
             throw FileNotFoundException("Empty byte array!")
         }
 
-        update { copy(inputDataType = InputDataType.ByteArray(data)) }
+        updateOptions { copy(inputDataType = InputDataType.ByteArray(data)) }
     }
 
-    fun withOutputFormat(format: String) = apply {
-        update { copy(outputFormat = format) }
+    /**
+     * Save the converted [Bitmap] to the disk. Default: true.
+     *
+     * **Note:** By default this is saved in the devices DCIM folder.
+     *
+     * @param[saveResultImage] Whether or not to save the bitmap to the disk
+     */
+    fun saveResultImage(saveResultImage: Boolean) = apply {
+        updateOptions { copy(saveResultImage = saveResultImage) }
     }
 
-    fun withOutputQuality(quality: Int) = apply {
-        update {
+    /**
+     * Set output image for when saving the result [Bitmap] to the disk. Default: [Format.JPEG].
+     *
+     * **Note:** This is unused if [saveResultImage] is passed `false`
+     *
+     * @param[format] The [Format] to use for the output.
+     * @see saveResultImage
+     */
+    fun withOutputFormat(format: Format) = apply {
+        updateOptions { copy(outputFormat = format) }
+    }
+
+    /**
+     * Set output image for when saving the result [Bitmap] to the disk. Default: [Format.JPEG]
+     *
+     * @param[format] The output format to use. **Note:** if [format] does not match any [Format]
+     * then [Format.JPEG] will be used as a default.
+     * @see saveResultImage
+     */
+    fun withOutputFormat(format: String) = withOutputFormat(Format.fromString(format))
+
+    /**
+     * Set the quality of the saved file. Default: 100
+     *
+     * **Note:** [quality] will be clamped between 0 and 100.
+     *
+     * @param[quality] A quality value between 0 and 100.
+     * @see saveResultImage
+     */
+    fun withOutputQuality(@IntRange(from = 0, to = 100) quality: Int) = apply {
+        updateOptions {
             copy(outputQuality = quality.coerceIn(0..100))
         }
     }
 
-    fun saveResultImage(saveResultImage: Boolean) = apply {
-        update { copy(saveResultImage = saveResultImage) }
-    }
-
+    /**
+     * Set the filename of the saved file. Default: A random UUID
+     *
+     * @param[convertedFileName] Filename to use for saving the result.
+     * @see saveResultImage
+     */
     fun saveFileWithName(convertedFileName: String) = apply {
-        update { copy(convertedFileName = convertedFileName) }
+        updateOptions { copy(convertedFileName = convertedFileName) }
     }
 
     @Deprecated(
@@ -123,14 +185,24 @@ class HeifConverter internal constructor(private val context: Context) {
             throw FileNotFoundException("Directory not found!")
         }
 
-        update { copy(pathToSaveDirectory = pathToDirectory) }
+        updateOptions { copy(pathToSaveDirectory = pathToDirectory) }
     }
 
+    /**
+     * Convert the HEIC input into a [Bitmap].
+     *
+     * There is no way of tracking the saved file or accessing the generated [Bitmap]. For that
+     * reason this method is deprecated and you should use [convertBlocking] or [convert].
+     *
+     * @return The [Job] used to launch the conversion coroutine.
+     * @see convert for asynchronous conversion.
+     * @see convertBlocking for synchronous conversion.
+     */
     @Deprecated(
         "You should really use convertBlocking or convert {}",
         ReplaceWith("convert { }"),
     )
-    fun convert(): Job = converter.convert()
+    fun convert(): Job = converter.convert {}
 
     /**
      * Convert the HEIC input into a [Bitmap] using coroutines to get the result synchronously.
@@ -147,13 +219,10 @@ class HeifConverter internal constructor(private val context: Context) {
      *  val bitmap: Bitmap? = result[HeifConverter.Key.BITMAP]
      * ```
      *
-     * @param[coroutineScope] Custom [CoroutineScope] for launching the conversion coroutine.
      * @return Result map containing the [Bitmap] and a path to the saved bitmap if [saveResultImage] is `true`.
      * @throws RuntimeException if no input file was provided, see [create].
      */
-    suspend fun convertBlocking(
-        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main),
-    ): Map<String, Any?> = converter.convertBlocking(coroutineScope)
+    suspend fun convertBlocking(): Map<String, Any?> = converter.convertBlocking()
 
     /**
      * Convert the HEIC input into a [Bitmap] using a callback to get the results asynchronously.
@@ -162,7 +231,7 @@ class HeifConverter internal constructor(private val context: Context) {
      *
      * @param[coroutineScope] Custom [CoroutineScope] for launching the conversion coroutine.
      * @param[block] Lambda for retrieving the results asynchronously.
-     * @return Result map containing the [Bitmap] and a path to the saved bitmap if [saveResultImage] is `true`.
+     * @return The [Job] used to launch the conversion coroutine.
      * @throws RuntimeException if no input file was provided, see [create].
      */
     fun convert(
@@ -170,15 +239,18 @@ class HeifConverter internal constructor(private val context: Context) {
         block: (result: Map<String, Any?>) -> Unit,
     ): Job = converter.convert(coroutineScope, block)
 
-    private fun update(block: Options.() -> Options) {
+    private fun updateOptions(block: Options.() -> Options) {
         options = options.run(block)
     }
 
+    /**
+     * A model for representing all the available options for [HeifConverter].
+     */
     internal data class Options(
         val inputDataType: InputDataType = None,
         val outputQuality: Int = 100,
-        val saveResultImage: Boolean = false,
-        val outputFormat: String = Format.JPEG,
+        val saveResultImage: Boolean = true,
+        val outputFormat: Format = Format.JPEG,
         val convertedFileName: String = UUID.randomUUID().toString(),
         val pathToSaveDirectory: String? = null,
     ) {
@@ -204,10 +276,20 @@ class HeifConverter internal constructor(private val context: Context) {
     /**
      * The supported output formats when saving the HEIF converted Bitmap to the disk.
      */
-    object Format {
-        const val JPEG = ".jpg"
-        const val PNG = ".png"
-        const val WEBP = ".webp"
+    sealed class Format(val extension: String) {
+        object JPEG : Format(".jpg")
+        object PNG : Format(".png")
+        object WEBP : Format(".webp")
+
+        companion object {
+
+            fun fromString(value: String): Format = when (value) {
+                JPEG.extension -> JPEG
+                PNG.extension -> PNG
+                WEBP.extension -> WEBP
+                else -> JPEG
+            }
+        }
     }
 
     /**
@@ -225,7 +307,7 @@ class HeifConverter internal constructor(private val context: Context) {
      * will be thrown when trying to convert.
      */
     internal sealed class InputDataType {
-        class File(val data: String) : InputDataType()
+        class File(val data: java.io.File) : InputDataType()
         class Url(val data: String) : InputDataType()
         class Resources(@DrawableRes val data: Int) : InputDataType()
         class InputStream(val data: java.io.InputStream) : InputDataType()
@@ -278,8 +360,6 @@ class HeifConverter internal constructor(private val context: Context) {
          * **Warning:** If you do not call one of the input methods a [RuntimeException] will
          * be thrown when [convert] or [convertBlocking] is invoked.
          */
-        fun create(context: Context) = HeifConverter(context).apply {
-            HeifReader.initialize(context)
-        }
+        fun create(context: Context) = HeifConverter(context)
     }
 }

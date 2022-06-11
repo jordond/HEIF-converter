@@ -1,4 +1,4 @@
-package linc.com.heifconverter
+package linc.com.heifconverter.decoding.legacy
 
 import android.content.Context
 import android.content.res.Resources
@@ -14,8 +14,9 @@ import android.util.Log
 import android.util.Size
 import android.view.Surface
 import kotlinx.coroutines.*
-import linc.com.heifconverter.iso14496.part12.*
-import linc.com.heifconverter.iso23008.part12.ImageSpatialExtentsBox
+import linc.com.heifconverter.ScriptC_yuv2rgb
+import linc.com.heifconverter.decoding.legacy.iso14496.part12.*
+import linc.com.heifconverter.decoding.legacy.iso23008.part12.ImageSpatialExtentsBox
 import org.mp4parser.Box
 import org.mp4parser.IsoFile
 import org.mp4parser.boxes.iso14496.part12.FileTypeBox
@@ -33,26 +34,14 @@ import java.util.*
  *
  * Create Bitmap object from HEIF file, byte-array, stream, etc.
  */
-internal object HeifReader {
-    private const val TAG = "HeifReader"
+internal class HeifReader(context: Context) {
 
-    /**
-     * input data size limitation for safety.
-     *
-     * 20MB
-     */
-    private const val LIMIT_FILESIZE = (20 * 1024 * 1024).toLong()
     private var mRenderScript: RenderScript? = null
     private var mCacheDir: File? = null
     private var mDecoderName: String? = null
     private var mDecoderSupportedSize: Size? = null
 
-    /**
-     * Initialize HeifReader module.
-     *
-     * @param context Context.
-     */
-    fun initialize(context: Context) {
+    init {
         mRenderScript = RenderScript.create(context)
         mCacheDir = context.cacheDir
 
@@ -557,4 +546,16 @@ internal object HeifReader {
     }
 
     private class FormatFallbackException(ex: Throwable?) : Exception(ex)
+
+    companion object {
+
+        private const val TAG = "HeifReader"
+
+        /**
+         * input data size limitation for safety.
+         *
+         * 20MB
+         */
+        private const val LIMIT_FILESIZE = (20 * 1024 * 1024).toLong()
+    }
 }
