@@ -28,17 +28,17 @@ internal class Converter constructor(
      * @return map of [HeifConverter.Key] to values
      */
     suspend fun convertBlocking(
-        scope: CoroutineScope = CoroutineScope(Dispatchers.Main),
+        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main),
     ): Map<String, Any?> = suspendCancellableCoroutine { cont ->
-        val job = convert(scope) { result -> cont.resume(result) }
+        val job = convert(coroutineScope) { result -> cont.resume(result) }
 
         cont.invokeOnCancellation { job.cancel() }
     }
 
     fun convert(
-        scope: CoroutineScope = CoroutineScope(Dispatchers.Main),
+        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main),
         block: (result: Map<String, Any?>) -> Unit,
-    ): Job = scope.launch(Dispatchers.Main) {
+    ): Job = coroutineScope.launch(Dispatchers.Main) {
         val bitmap = withContext(Dispatchers.IO) {
             options.inputDataType.createBitmap(context)
         } ?: return@launch block(createResultMap(null))

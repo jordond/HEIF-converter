@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         val resultImage = findViewById<ImageView>(R.id.resultImage)
 
         convert.setOnClickListener {
-            HeifConverter.with(this)
+            HeifConverter.create(this)
                 .fromUrl("https://github.com/nokiatech/heif/raw/gh-pages/content/images/crowd_1440x960.heic")
                 .withOutputFormat(HeifConverter.Format.PNG)
                 .withOutputQuality(100)
