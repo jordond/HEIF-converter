@@ -41,8 +41,7 @@ internal class Converter constructor(
         }
 
         // Figure out where to save it
-        val directoryToSave = File(options.pathToSaveDirectory)
-        val outputFile = File(directoryToSave, options.outputFileName)
+        val outputFile = File(options.pathToSaveDirectory, options.outputFileName)
 
         // Save the bitmap and trigger callback
         val savedFilePath = bitmap.saveToFile(outputFile)
@@ -114,7 +113,7 @@ internal class Converter constructor(
      *
      * **Note:** On Android R and higher a lossy WEBP is used.
      */
-    private fun useFormat(format: String) = when (format) {
+    private fun useFormat(format: Format) = when (format) {
         Format.WEBP ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Bitmap.CompressFormat.WEBP_LOSSY
             else @Suppress("DEPRECATION") Bitmap.CompressFormat.WEBP
