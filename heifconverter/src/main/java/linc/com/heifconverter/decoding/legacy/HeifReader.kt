@@ -36,18 +36,18 @@ import java.util.*
  */
 internal class HeifReader(context: Context) {
 
-    private var mRenderScript: RenderScript? = null
-    private var mCacheDir: File? = null
-    private var mDecoderName: String? = null
-    private var mDecoderSupportedSize: Size? = null
+    private var renderScript: RenderScript? = null
+    private var cacheDir: File? = null
+    private var decoderName: String? = null
+    private var decoderSupportedSize: Size? = null
 
     init {
-        mRenderScript = RenderScript.create(context)
-        mCacheDir = context.cacheDir
+        renderScript = RenderScript.create(context)
+        cacheDir = context.cacheDir
 
         // find best HEVC decoder
-        mDecoderName = null
-        mDecoderSupportedSize = Size(0, 0)
+        decoderName = null
+        decoderSupportedSize = Size(0, 0)
         val numCodecs = MediaCodecList.getCodecCount()
         for (i in 0 until numCodecs) {
             val codecInfo = MediaCodecList.getCodecInfoAt(i)
@@ -56,29 +56,28 @@ internal class HeifReader(context: Context) {
             }
             for (type in codecInfo.supportedTypes) {
                 if (type.equals(MediaFormat.MIMETYPE_VIDEO_HEVC, ignoreCase = true)) {
-                    val cap =
-                        codecInfo.getCapabilitiesForType(MediaFormat.MIMETYPE_VIDEO_HEVC)
-                    val vcap = cap.videoCapabilities
-                    val supportedSize = Size(
-                        vcap.supportedWidths.upper,
-                        vcap.supportedHeights.upper
-                    )
+                    val cap = codecInfo.getCapabilitiesForType(MediaFormat.MIMETYPE_VIDEO_HEVC)
+                    val (width, height) = cap.videoCapabilities.run {
+                        supportedWidths.upper to supportedHeights.upper
+                    }
+                    val supportedSize = Size(width, height)
                     Log.d(
-                        TAG, "HEVC decoder=\"" + codecInfo.name + "\""
-                                + " supported-size=" + supportedSize
-                                + " color-formats=" + Arrays.toString(cap.colorFormats)
+                        TAG,
+                        "HEVC decoder=\"" + codecInfo.name + "\""
+                            + " supported-size=" + supportedSize
+                            + " color-formats=" + Arrays.toString(cap.colorFormats)
                     )
-                    if (mDecoderSupportedSize!!.width * mDecoderSupportedSize!!.height < supportedSize.width * supportedSize.height) {
-                        mDecoderName = codecInfo.name
-                        mDecoderSupportedSize = supportedSize
+                    if (decoderSupportedSize!!.width * decoderSupportedSize!!.height < supportedSize.width * supportedSize.height) {
+                        decoderName = codecInfo.name
+                        decoderSupportedSize = supportedSize
                     }
                 }
             }
         }
-        if (mDecoderName == null) {
+        if (decoderName == null) {
             throw RuntimeException("no HEVC decoding support")
         }
-        Log.i(TAG,"HEVC decoder=\"$mDecoderName\" supported-size=$mDecoderSupportedSize")
+        Log.i(TAG,"HEVC decoder=\"$decoderName\" supported-size=$decoderSupportedSize")
     }
 
     /**
@@ -125,21 +124,27 @@ internal class HeifReader(context: Context) {
      */
     suspend fun decodeFile(pathName: String): Bitmap? {
         assertPrecondition()
-        try {
-            val file = File(pathName)
-            val fileSize = file.length()
-            if (LIMIT_FILESIZE < fileSize) {
-                Log.e(TAG, "file size exceeds limit($LIMIT_FILESIZE)")
-                return null
-            }
-            val data = ByteArray(fileSize.toInt())
-            FileInputStream(file).use { fis ->
-                fis.read(data)
-                return decodeByteArray(data)
-            }
-        } catch (ex: IOException) {
-            Log.e(TAG, "decodeFile failure", ex)
+        val file = File(pathName)
+        val fileSize = file.length()
+        if (LIMIT_FILESIZE < fileSize) {
+            Log.e(TAG, "file size exceeds limit($LIMIT_FILESIZE)")
             return null
+        }
+
+        val data = ByteArray(fileSize.toInt())
+        val result = runCatching {
+            withContext(Dispatchers.IO) {
+                FileInputStream(file).use { fileInputStream ->
+                    fileInputStream.read(data)
+                }
+            }
+        }.onFailure { cause -> if (cause is CancellationException) throw cause }
+
+        val exception = result.exceptionOrNull()
+        return if (exception == null) decodeByteArray(data)
+        else {
+            Log.e(TAG, "decodeFile failure", exception)
+            null
         }
     }
 
@@ -178,7 +183,7 @@ internal class HeifReader(context: Context) {
             // write stream to temporary file
             val beginTime = SystemClock.elapsedRealtimeNanos()
             val heifFile =
-                File.createTempFile("heifreader", "heif", mCacheDir)
+                File.createTempFile("heifreader", "heif", cacheDir)
                 FileOutputStream(heifFile).use { fos ->
                 val buf = ByteArray(4096)
                 var totalLength = 0
@@ -217,7 +222,7 @@ internal class HeifReader(context: Context) {
     }
 
     private fun assertPrecondition() {
-        checkNotNull(mRenderScript) { "HeifReader is not initialized." }
+        checkNotNull(renderScript) { "HeifReader is not initialized." }
     }
 
     @Throws(IOException::class)
@@ -363,11 +368,11 @@ internal class HeifReader(context: Context) {
         maxInputSize: Int,
         surface: Surface
     ): MediaCodec {
-        if (mDecoderSupportedSize!!.width < info.size!!.width || mDecoderSupportedSize!!.height < info.size!!.height) {
+        if (decoderSupportedSize!!.width < info.size!!.width || decoderSupportedSize!!.height < info.size!!.height) {
             Log.w(TAG, "HEVC image may exceed decoder capability")
         }
         return try {
-            val decoder = MediaCodec.createByCodecName(mDecoderName!!)
+            val decoder = MediaCodec.createByCodecName(decoderName!!)
             val inputFormat = MediaFormat.createVideoFormat(
                 MediaFormat.MIMETYPE_VIDEO_HEVC, info.size!!.width, info.size!!.height
             )
@@ -465,7 +470,7 @@ internal class HeifReader(context: Context) {
     }
 
     private fun convertYuv420ToBitmap(image: Image?): Bitmap {
-        val rs = mRenderScript
+        val rs = renderScript
         val width = image!!.width
         val height = image.height
         val chromaWidth = width / 2
