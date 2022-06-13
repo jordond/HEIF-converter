@@ -258,11 +258,18 @@ class HeifConverter internal constructor(
 
     /**
      * A model for representing all the available options for [HeifConverter].
+     *
+     * @property[input] The [Input] source for the HEIC data. See [fromFile], [fromUrl], etc.
+     * @property[saveResultImage] Save the converted [Bitmap] to the device. See [saveResultImage].
+     * @property[outputQuality] The quality of the saved image. See [withOutputQuality].
+     * @property[outputFormat] Format of the saved image. See [withOutputFormat].
+     * @property[convertedFileName] The file name for the saved image. See [saveFileWithName].
+     * @property[pathToSaveDirectory] The folder to save converted image to. See [saveToDirectory].
      */
     data class Options constructor(
         val input: Input = None,
-        val outputQuality: Int = 100,
         val saveResultImage: Boolean = true,
+        val outputQuality: Int = 100,
         val outputFormat: Format = Format.JPEG,
         val convertedFileName: String = UUID.randomUUID().toString(),
         val pathToSaveDirectory: File? = null,
@@ -272,6 +279,9 @@ class HeifConverter internal constructor(
 
         companion object {
 
+            /**
+             * Get a [File] reference for the default output path.
+             */
             fun defaultOutputPath(context: Context): File? {
                 val path = ContextCompat.getExternalFilesDirs(
                     context,

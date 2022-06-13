@@ -1,29 +1,129 @@
 package linc.com.heifconverter.dsl
 
 import android.content.Context
+import android.graphics.Bitmap
 import androidx.annotation.IntRange
 import linc.com.heifconverter.HeifConverter
+import linc.com.heifconverter.HeifConverter.Format
 import java.io.File
 
+/**
+ * DSL builder for generating a [HeifConverter] or [HeifConverter.Options].
+ *
+ * Create a converter for a URL:
+ *
+ * ```
+ * val converter = HeifConverter.create(context, "https://sample.com/image.heic") {
+ *     saveResultImage = true
+ *     outputDirectory = File(context.cacheDir)
+ * }
+ *
+ * val result = converter.convert()
+ * ```
+ *
+ * Convert a [File] reference:
+ *
+ * ```
+ * val heicFile = File(context.cacheDir, "image.heic")
+ * val result = HeifConverter.convert(context, heicFile) {
+ *     saveResultImage = true
+ *     outputName = "image"
+ *     outputDirectory = File(context.cacheDir)
+ *     outputFormat = HeifConverter.Format.JPEG
+ * }
+ * ```
+ *
+ * Build a [HeifConverter.Options] instance:
+ *
+ * ```
+ * val options = HeifConverter.Options.build {
+ *     saveResultImage = true
+ *     outputQuality(50)
+ *     outputDirectory(context.cacheDir)
+ * }
+ * ```
+ */
 public interface HeifConverterDsl {
 
+    /**
+     * Set to `true` to save the converted [Bitmap] to [HeifConverter.Options.pathToSaveDirectory].
+     *
+     * @see HeifConverter.saveResultImage
+     */
     public var saveResultImage: Boolean
+
+    /**
+     * Set to `true` to save the converted [Bitmap] to [HeifConverter.Options.pathToSaveDirectory].
+     *
+     * @see HeifConverter.saveResultImage
+     */
     public fun saveResultImage(saveResultImage: Boolean)
 
+    /**
+     * Set output image for when saving the result [Bitmap] to the disk. Default: [Format.JPEG].
+     *
+     * @see HeifConverter.withOutputFormat
+     */
     public var outputFormat: HeifConverter.Format
+
+    /**
+     * Set output image for when saving the result [Bitmap] to the disk. Default: [Format.JPEG].
+     *
+     * @see HeifConverter.withOutputFormat
+     */
     public fun outputFormat(format: HeifConverter.Format)
 
+    /**
+     * Set the quality of the saved file. Default: 100
+     *
+     * @see HeifConverter.withOutputQuality
+     */
     public fun outputQuality(@IntRange(from = 0, to = 100) quality: Int)
 
+    /**
+     * Set the filename of the saved file. Default: A random UUID
+     *
+     * @see HeifConverter.saveFileWithName
+     */
     public var outputName: String
+
+    /**
+     * Set the filename of the saved file. Default: A random UUID
+     *
+     * @see HeifConverter.saveFileWithName
+     */
     public fun outputName(fileName: String)
 
+    /**
+     * Set the output directory of the saved file using a [File] reference. Default: DCIM folder
+     *
+     * @see HeifConverter.saveToDirectory
+     */
     public var outputDirectory: File?
+
+    /**
+     * Set the output directory of the saved file using a [File] reference. Default: DCIM folder
+     *
+     * @see HeifConverter.saveToDirectory
+     */
     public fun outputDirectory(directory: File)
+
+    /**
+     * Set the output directory of the saved file using an absolute path reference.
+     *
+     * Default: DCIM folder
+     *
+     * @see HeifConverter.saveToDirectory
+     */
     public fun outputDirectory(path: String) {
         outputDirectory(File(path))
     }
 
+    /**
+     * Use a default directory for saving the bitmap. See [HeifConverter.Options.defaultOutputPath].
+     *
+     * @see HeifConverter.Options.pathToSaveDirectory
+     */
     public fun useDefaultOutputPath(context: Context)
 }
 
