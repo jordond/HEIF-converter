@@ -17,10 +17,10 @@ public class HeifConverterInstance internal constructor(private val converter: H
     /**
      * Convert the HEIC input into a [Bitmap] using coroutines to get the result synchronously.
      *
-     * @return Result map containing the [Bitmap] and a path to the saved bitmap.
+     * @return Result mapped to an instance of [HeifConverterResult]
      * @see HeifConverter.convertBlocking for more info.
      */
-    public suspend fun convert(): Map<String, Any?> = converter.convertBlocking()
+    public suspend fun convert(): HeifConverterResult = converter.convertBlocking().mapResult()
 
     /**
      * Convert the HEIC input into a [Bitmap] using coroutines to get the result asynchronously.
@@ -34,6 +34,9 @@ public class HeifConverterInstance internal constructor(private val converter: H
      */
     public fun convert(
         coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main),
-        block: (Map<String, Any?>) -> Unit,
-    ): Job = converter.convert(coroutineScope, block)
+        block: (HeifConverterResult) -> Unit,
+    ): Job = converter.convert(coroutineScope) { result -> block(result.mapResult()) }
+
+    private fun Map<String, Any?>.mapResult() = HeifConverterResult.parse(this)
 }
+

@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import androidx.annotation.DrawableRes
 import linc.com.heifconverter.HeifConverter
 import linc.com.heifconverter.dsl.HeifConverterDsl
+import linc.com.heifconverter.dsl.HeifConverterResult
 import linc.com.heifconverter.dsl.extension.create.create
 import java.io.File
 import java.io.InputStream
@@ -28,7 +29,7 @@ import java.io.InputStream
  * @param[context] [Context] reference to initialize [HeifConverter].
  * @param[file] Input HEIC [File].
  * @param[options] Custom [HeifConverter.Options] for [HeifConverter].
- * @return Result map containing the [Bitmap] and a path to the saved bitmap.
+ * @return Result mapped to an instance of [HeifConverterResult]
  * @see HeifConverter.convertBlocking for more info.
  * @see HeifConverterDsl for all available options.
  */
@@ -36,7 +37,7 @@ public suspend fun HeifConverter.Companion.convert(
     context: Context,
     file: File,
     options: HeifConverter.Options,
-): Map<String, Any?> = create(context, file, options).convert()
+): HeifConverterResult = create(context, file, options).convert()
 
 /**
  * A method for converting a HEIC from [InputStream] to a [Bitmap].
@@ -58,7 +59,7 @@ public suspend fun HeifConverter.Companion.convert(
  * @param[context] [Context] reference to initialize [HeifConverter].
  * @param[inputStream] Input HEIC as an [InputStream].
  * @param[options] Custom [HeifConverter.Options] for [HeifConverter].
- * @return Result map containing the [Bitmap] and a path to the saved bitmap.
+ * @return Result mapped to an instance of [HeifConverterResult]
  * @see HeifConverter.convertBlocking for more info.
  * @see HeifConverterDsl for all available options.
  */
@@ -66,7 +67,7 @@ public suspend fun HeifConverter.Companion.convert(
     context: Context,
     inputStream: InputStream,
     options: HeifConverter.Options,
-): Map<String, Any?> = create(context, inputStream, options).convert()
+): HeifConverterResult = create(context, inputStream, options).convert()
 
 /**
  * A method for converting a HEIC from [DrawableRes] resource ID [Int] to a [Bitmap].
@@ -86,7 +87,7 @@ public suspend fun HeifConverter.Companion.convert(
  * @param[context] [Context] reference to initialize [HeifConverter].
  * @param[resId] Input HEIC resource id [Int].
  * @param[options] Custom [HeifConverter.Options] for [HeifConverter].
- * @return Result map containing the [Bitmap] and a path to the saved bitmap.
+ * @return Result mapped to an instance of [HeifConverterResult]
  * @see HeifConverter.convertBlocking for more info.
  * @see HeifConverterDsl for all available options.
  */
@@ -94,7 +95,7 @@ public suspend fun HeifConverter.Companion.convert(
     context: Context,
     @DrawableRes resId: Int,
     options: HeifConverter.Options,
-): Map<String, Any?> = create(context, resId, options).convert()
+): HeifConverterResult = create(context, resId, options).convert()
 
 /**
  * A method for converting a HEIC from a [String] image URL to a [Bitmap].
@@ -116,7 +117,7 @@ public suspend fun HeifConverter.Companion.convert(
  * @param[context] [Context] reference to initialize [HeifConverter].
  * @param[imageUrl] A URL pointing to a HEIC file.
  * @param[options] Custom [HeifConverter.Options] for [HeifConverter].
- * @return Result map containing the [Bitmap] and a path to the saved bitmap.
+ * @return Result mapped to an instance of [HeifConverterResult]
  * @see HeifConverter.convertBlocking for more info.
  * @see HeifConverterDsl for all available options.
  */
@@ -124,7 +125,7 @@ public suspend fun HeifConverter.Companion.convert(
     context: Context,
     imageUrl: String,
     options: HeifConverter.Options,
-): Map<String, Any?> = create(context, imageUrl, options).convert()
+): HeifConverterResult = create(context, imageUrl, options).convert()
 
 /**
  * A method for converting a [ByteArray] HEIC to a [Bitmap].
@@ -145,7 +146,7 @@ public suspend fun HeifConverter.Companion.convert(
  * @param[context] [Context] reference to initialize [HeifConverter].
  * @param[byteArray] Input HEIC data as a [ByteArray].
  * @param[options] Custom [HeifConverter.Options] for [HeifConverter].
- * @return Result map containing the [Bitmap] and a path to the saved bitmap.
+ * @return Result mapped to an instance of [HeifConverterResult]
  * @see HeifConverter.convertBlocking for more info.
  * @see HeifConverterDsl for all available options.
  */
@@ -153,7 +154,7 @@ public suspend fun HeifConverter.Companion.convert(
     context: Context,
     byteArray: ByteArray,
     options: HeifConverter.Options,
-): Map<String, Any?> = create(context, byteArray, options).convert()
+): HeifConverterResult = create(context, byteArray, options).convert()
 
 /**
  * A method for converting a [HeifConverter.Input] HEIC to a [Bitmap].
@@ -174,7 +175,7 @@ public suspend fun HeifConverter.Companion.convert(
  * @param[context] [Context] reference to initialize [HeifConverter].
  * @param[input] Input HEIC data a instance of [HeifConverter.Input].
  * @param[options] Custom [HeifConverter.Options] for [HeifConverter].
- * @return Result map containing the [Bitmap] and a path to the saved bitmap.
+ * @return Result mapped to an instance of [HeifConverterResult]
  * @see HeifConverter.convertBlocking for more info.
  * @see HeifConverterDsl for all available options.
  */
@@ -182,4 +183,4 @@ public suspend fun HeifConverter.Companion.convert(
     context: Context,
     input: HeifConverter.Input,
     options: HeifConverter.Options,
-): Map<String, Any?> = create(context, input, options).convert()
+): HeifConverterResult = create(context, input, options).convert()
