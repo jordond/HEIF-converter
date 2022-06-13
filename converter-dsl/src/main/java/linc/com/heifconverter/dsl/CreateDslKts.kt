@@ -92,7 +92,7 @@ public fun HeifConverter.Companion.create(
 ): HeifConverterInstance = create(context, Input.Resources(resId), block)
 
 /**
- * A DSL builder for creating a [HeifConverter] with [String] image URL as the input
+ * A DSL builder for creating a [HeifConverter] with [String] image URL as the input.
  *
  * First [imageUrl] will be downloaded then converted to a [Bitmap].
  *

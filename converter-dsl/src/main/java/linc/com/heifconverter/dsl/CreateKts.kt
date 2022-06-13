@@ -65,7 +65,7 @@ public fun HeifConverter.Companion.create(
 ): HeifConverterInstance = create(context, HeifConverter.Input.InputStream(inputStream), options)
 
 /**
- * A DSL builder for creating a [HeifConverter] with a [DrawableRes] [Int] as the input.
+ * A method for creating a [HeifConverter] with a [DrawableRes] [Int] as the input.
  *
  * Example:
  *
@@ -92,7 +92,7 @@ public fun HeifConverter.Companion.create(
 ): HeifConverterInstance = create(context, HeifConverter.Input.Resources(resId), options)
 
 /**
- * A DSL builder for creating a [HeifConverter] with [String] image URL as the input
+ * A method for creating a [HeifConverter] with [String] image URL as the input
  *
  * First [imageUrl] will be downloaded then converted to a [Bitmap].
  *
@@ -121,7 +121,7 @@ public fun HeifConverter.Companion.create(
 ): HeifConverterInstance = create(context, HeifConverter.Input.Url(imageUrl), options)
 
 /**
- * A DSL builder for creating a [HeifConverter] with a [ByteArray] input.
+ * A method for creating a [HeifConverter] with a [ByteArray] input.
  *
  * Example:
  *
@@ -149,7 +149,7 @@ public fun HeifConverter.Companion.create(
 ): HeifConverterInstance = create(context, HeifConverter.Input.ByteArray(byteArray), options)
 
 /**
- * A DSL builder for creating a [HeifConverter].
+ * A method for creating a [HeifConverter] with the customized [HeifConverter.Options].
  *
  * Example:
  *
