@@ -9,6 +9,7 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import linc.com.heifconverter.HeifConverter
+import linc.com.heifconverter.dsl.HeifConverterResult
 import linc.com.heifconverter.dsl.extension.create.create
 
 class MainActivity : AppCompatActivity() {
@@ -48,14 +49,15 @@ class MainActivity : AppCompatActivity() {
             .saveFileWithName("Image_Converted_Name")
             .saveResultImage(true)
             .convert(lifecycleScope) { result ->
-                handleResult(resultImage, result)
+                handleResult(resultImage, HeifConverterResult.parse(result))
             }
     }
 
-    private fun handleResult(resultImage: ImageView, result: Map<String, Any?>) {
-        val path = result[HeifConverter.Key.IMAGE_PATH] as String
-        Log.i("MainActivity", "Saved bitmap to: $path")
-        resultImage.setImageBitmap((result[HeifConverter.Key.BITMAP] as Bitmap))
+    private fun handleResult(resultImage: ImageView, result: HeifConverterResult) {
+        if (result.imagePath != null) {
+            Log.i("MainActivity", "Saved bitmap to: ${result.imagePath}")
+        }
+        resultImage.setImageBitmap((result.bitmap as Bitmap))
     }
 
     companion object {
