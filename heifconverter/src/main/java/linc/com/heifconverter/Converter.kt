@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import linc.com.heifconverter.HeifConverter.Companion.create
 import linc.com.heifconverter.HeifConverter.Format
-import linc.com.heifconverter.HeifConverter.InputDataType
+import linc.com.heifconverter.HeifConverter.Input
 import linc.com.heifconverter.HeifConverter.Key
 import linc.com.heifconverter.HeifConverter.Options
 import linc.com.heifconverter.decoding.Decoder
@@ -32,7 +32,7 @@ internal class Converter constructor(
      */
     suspend fun convertBlocking(): Map<String, Any?> {
         val bitmap = withContext(Dispatchers.IO) {
-            options.inputDataType.createBitmap(context)
+            options.input.createBitmap(context)
         } ?: return createResultMap(null)
 
         // Return early if we don't need to save the bitmap
@@ -68,17 +68,17 @@ internal class Converter constructor(
     /**
      * Create the [Bitmap] using a [Decoder] based on the Android OS level.
      */
-    private suspend fun InputDataType.createBitmap(context: Context): Bitmap? {
+    private suspend fun Input.createBitmap(context: Context): Bitmap? {
         val decoder: Decoder =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ModernDecoder(context)
             else LegacyDecoder(context)
 
         return when (this) {
-            is InputDataType.ByteArray -> decoder.fromByteArray(data)
-            is InputDataType.File -> decoder.fromFile(data)
-            is InputDataType.InputStream -> decoder.fromInputStream(data)
-            is InputDataType.Resources -> decoder.fromResources(data)
-            is InputDataType.Url -> decoder.fromUrl(data)
+            is Input.ByteArray -> decoder.fromByteArray(data)
+            is Input.File -> decoder.fromFile(data)
+            is Input.InputStream -> decoder.fromInputStream(data)
+            is Input.Resources -> decoder.fromResources(data)
+            is Input.Url -> decoder.fromUrl(data)
             else -> throw IllegalStateException(
                 "You forget to pass input type: File, Url etc. Use such functions: fromFile() etc."
             )

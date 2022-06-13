@@ -16,10 +16,17 @@ android {
         sourceCompatibility 1.8
         targetCompatibility 1.8
     }
+
+    kotlinOptions {
+        freeCompilerArgs += '-Xexplicit-api=strict'
+    }
 }
 
 dependencies {
     implementation project(":heifconverter")
+
+    // AndroidX
+    api 'androidx.appcompat:appcompat:1.4.2'
 
     // Coroutines
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"

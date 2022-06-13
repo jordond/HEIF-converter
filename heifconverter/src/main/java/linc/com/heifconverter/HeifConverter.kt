@@ -10,7 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import linc.com.heifconverter.HeifConverter.Companion.create
-import linc.com.heifconverter.HeifConverter.InputDataType.None
+import linc.com.heifconverter.HeifConverter.Input.None
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.InputStream
@@ -26,16 +26,17 @@ import java.util.*
  * @constructor Converter with all default options.
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class HeifConverter internal constructor(private val context: Context) {
-
-    private var options = Options.default(context)
+class HeifConverter internal constructor(
+    private val context: Context,
+    private var options: Options,
+) {
 
     /**
-     * Will throw an [IllegalArgumentException] if invoked before [Options.inputDataType] is set.
+     * Will throw an [IllegalArgumentException] if invoked before [Options.input] is set.
      */
     private val converter: Converter
         get() {
-            if (options.inputDataType is None) throw IllegalArgumentException(
+            if (options.input is None) throw IllegalArgumentException(
                 "No input type was provided! Use .fromFile, fromUrl, fromInputStream, etc!",
             )
 
@@ -62,7 +63,7 @@ class HeifConverter internal constructor(private val context: Context) {
             throw FileNotFoundException("HEIC file not found! ${file.absolutePath}")
         }
 
-        updateOptions { copy(inputDataType = InputDataType.File(file)) }
+        updateOptions { copy(input = Input.File(file)) }
     }
 
     /**
@@ -71,7 +72,7 @@ class HeifConverter internal constructor(private val context: Context) {
      * @param[inputStream] [InputStream] for HEIC image.
      */
     fun fromInputStream(inputStream: InputStream) = apply {
-        updateOptions { copy(inputDataType = InputDataType.InputStream(inputStream)) }
+        updateOptions { copy(input = Input.InputStream(inputStream)) }
     }
 
     /**
@@ -91,7 +92,7 @@ class HeifConverter internal constructor(private val context: Context) {
             throw FileNotFoundException("Resource not found!")
         }
 
-        updateOptions { copy(inputDataType = InputDataType.Resources(resId)) }
+        updateOptions { copy(input = Input.Resources(resId)) }
     }
 
     /**
@@ -102,7 +103,7 @@ class HeifConverter internal constructor(private val context: Context) {
      * @param[heicImageUrl] URL pointing to an HEIC file.
      */
     fun fromUrl(heicImageUrl: String) = apply {
-        updateOptions { copy(inputDataType = InputDataType.Url(heicImageUrl)) }
+        updateOptions { copy(input = Input.Url(heicImageUrl)) }
     }
 
     /**
@@ -116,7 +117,7 @@ class HeifConverter internal constructor(private val context: Context) {
             throw FileNotFoundException("Empty byte array!")
         }
 
-        updateOptions { copy(inputDataType = InputDataType.ByteArray(data)) }
+        updateOptions { copy(input = Input.ByteArray(data)) }
     }
 
     /**
@@ -258,8 +259,8 @@ class HeifConverter internal constructor(private val context: Context) {
     /**
      * A model for representing all the available options for [HeifConverter].
      */
-    internal data class Options(
-        val inputDataType: InputDataType = None,
+    data class Options constructor(
+        val input: Input = None,
         val outputQuality: Int = 100,
         val saveResultImage: Boolean = true,
         val outputFormat: Format = Format.JPEG,
@@ -271,18 +272,13 @@ class HeifConverter internal constructor(private val context: Context) {
 
         companion object {
 
-            /**
-             * Create a default instance of [Options].
-             *
-             * @param[context] Used to get the [Options.pathToSaveDirectory].
-             */
-            internal fun default(context: Context): Options {
-                val outputPath = ContextCompat.getExternalFilesDirs(
+            fun defaultOutputPath(context: Context): File? {
+                val path = ContextCompat.getExternalFilesDirs(
                     context,
                     Environment.DIRECTORY_DCIM
-                )[0].path
+                )[0].path ?: return null
 
-                return Options(pathToSaveDirectory = File(outputPath))
+                return File(path)
             }
         }
     }
@@ -327,13 +323,13 @@ class HeifConverter internal constructor(private val context: Context) {
      * **Note**: [None] is the default when constructing an [Options] object but an exception
      * will be thrown when trying to convert.
      */
-    internal sealed class InputDataType {
-        class File(val data: java.io.File) : InputDataType()
-        class Url(val data: String) : InputDataType()
-        class Resources(@DrawableRes val data: Int) : InputDataType()
-        class InputStream(val data: java.io.InputStream) : InputDataType()
-        class ByteArray(val data: kotlin.ByteArray) : InputDataType()
-        object None : InputDataType()
+    sealed class Input {
+        class File(val data: java.io.File) : Input()
+        class Url(val data: String) : Input()
+        class Resources(@DrawableRes val data: Int) : Input()
+        class InputStream(val data: java.io.InputStream) : Input()
+        class ByteArray(val data: kotlin.ByteArray) : Input()
+        object None : Input()
     }
 
     companion object {
@@ -386,6 +382,9 @@ class HeifConverter internal constructor(private val context: Context) {
          * **Warning:** If you do not call one of the input methods a [IllegalStateException] will
          * be thrown when [convert] or [convertBlocking] is invoked.
          */
-        fun create(context: Context) = HeifConverter(context)
+        fun create(
+            context: Context,
+            options: Options = Options(),
+        ) = HeifConverter(context, options)
     }
 }
