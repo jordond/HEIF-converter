@@ -1,6 +1,8 @@
-package linc.com.heifconverter.dsl
+package linc.com.heifconverter.dsl.extension
 
 import linc.com.heifconverter.HeifConverter
+import linc.com.heifconverter.dsl.HeifConverterDsl
+import linc.com.heifconverter.dsl.InternalHeifConverterDsl
 
 /**
  * A DSL builder method for creating an instance of [HeifConverter.Options].

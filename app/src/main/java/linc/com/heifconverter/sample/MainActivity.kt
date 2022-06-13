@@ -9,7 +9,7 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import linc.com.heifconverter.HeifConverter
-import linc.com.heifconverter.dsl.create
+import linc.com.heifconverter.dsl.extension.create.create
 
 class MainActivity : AppCompatActivity() {
 

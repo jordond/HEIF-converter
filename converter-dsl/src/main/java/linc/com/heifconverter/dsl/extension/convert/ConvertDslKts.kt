@@ -1,9 +1,11 @@
-package linc.com.heifconverter.dsl
+package linc.com.heifconverter.dsl.extension.convert
 
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.annotation.DrawableRes
 import linc.com.heifconverter.HeifConverter
+import linc.com.heifconverter.dsl.HeifConverterDsl
+import linc.com.heifconverter.dsl.extension.create.create
 import java.io.File
 import java.io.InputStream
 
