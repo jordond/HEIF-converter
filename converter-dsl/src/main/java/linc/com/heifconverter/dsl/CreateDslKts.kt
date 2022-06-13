@@ -35,9 +35,7 @@ public fun HeifConverter.Companion.create(
     context: Context,
     file: File,
     block: HeifConverterDsl.() -> Unit = {},
-): HeifConverterInstance = HeifConverterInstance(
-    converter = createConverter(context, Input.File(file), block)
-)
+): HeifConverterInstance = create(context, Input.File(file), block)
 
 /**
  * A DSL builder for creating a [HeifConverter] with a [InputStream] input.
@@ -65,9 +63,7 @@ public fun HeifConverter.Companion.create(
     context: Context,
     inputStream: InputStream,
     block: HeifConverterDsl.() -> Unit = {},
-): HeifConverterInstance = HeifConverterInstance(
-    converter = createConverter(context, Input.InputStream(inputStream), block)
-)
+): HeifConverterInstance = create(context, Input.InputStream(inputStream), block)
 
 /**
  * A DSL builder for creating a [HeifConverter] with a [DrawableRes] [Int] as the input.
@@ -93,9 +89,7 @@ public fun HeifConverter.Companion.create(
     context: Context,
     @DrawableRes resId: Int,
     block: HeifConverterDsl.() -> Unit = {},
-): HeifConverterInstance = HeifConverterInstance(
-    converter = createConverter(context, Input.Resources(resId), block)
-)
+): HeifConverterInstance = create(context, Input.Resources(resId), block)
 
 /**
  * A DSL builder for creating a [HeifConverter] with [String] image URL as the input
@@ -123,9 +117,7 @@ public fun HeifConverter.Companion.create(
     context: Context,
     imageUrl: String,
     block: HeifConverterDsl.() -> Unit = {},
-): HeifConverterInstance = HeifConverterInstance(
-    converter = createConverter(context, Input.Url(imageUrl), block)
-)
+): HeifConverterInstance = create(context, Input.Url(imageUrl), block)
 
 /**
  * A DSL builder for creating a [HeifConverter] with a [ByteArray] input.
@@ -152,9 +144,34 @@ public fun HeifConverter.Companion.create(
     context: Context,
     byteArray: ByteArray,
     block: HeifConverterDsl.() -> Unit = {},
-): HeifConverterInstance = HeifConverterInstance(
-    converter = createConverter(context, Input.ByteArray(byteArray), block)
-)
+): HeifConverterInstance = create(context, Input.ByteArray(byteArray), block)
+
+/**
+ * A DSL builder for creating a [HeifConverter].
+ *
+ * Example:
+ *
+ * ```
+ * val input = HeifConverter.Input.Url("https://sample.com/image.heic")
+ * val converter = HeifConverter.create(context, input) {
+ *     saveResultImage = true
+ *     outputDirectory = File(context.cacheDir)
+ * }
+ *
+ * val result = converter.convert()
+ * ```
+ *
+ * @param[context] [Context] reference to initialize [HeifConverter].
+ * @param[input] Input HEIC data a instance of [HeifConverter.Input].
+ * @param[block] A lambda scoped to [HeifConverterDsl] for building a [HeifConverter].
+ * @return A [HeifConverterInstance] for converting the [HeifConverter.Input].
+ * @see HeifConverterDsl for all available options.
+ */
+public fun HeifConverter.Companion.create(
+    context: Context,
+    input: Input,
+    block: HeifConverterDsl.() -> Unit,
+): HeifConverterInstance = HeifConverterInstance(createConverter(context, input, block))
 
 private fun createConverter(
     context: Context,
