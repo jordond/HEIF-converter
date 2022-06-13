@@ -14,9 +14,21 @@ public suspend fun HeifConverter.Companion.convert(
 
 public suspend fun HeifConverter.Companion.convert(
     context: Context,
+    file: File,
+    options: HeifConverter.Options,
+): Map<String, Any?> = create(context, file, options).convert()
+
+public suspend fun HeifConverter.Companion.convert(
+    context: Context,
     inputStream: InputStream,
     block: HeifConverterDsl.() -> Unit = {},
 ): Map<String, Any?> = create(context, inputStream, block).convert()
+
+public suspend fun HeifConverter.Companion.convert(
+    context: Context,
+    inputStream: InputStream,
+    options: HeifConverter.Options,
+): Map<String, Any?> = create(context, inputStream, options).convert()
 
 public suspend fun HeifConverter.Companion.convert(
     context: Context,
@@ -26,12 +38,30 @@ public suspend fun HeifConverter.Companion.convert(
 
 public suspend fun HeifConverter.Companion.convert(
     context: Context,
+    @DrawableRes resId: Int,
+    options: HeifConverter.Options,
+): Map<String, Any?> = create(context, resId, options).convert()
+
+public suspend fun HeifConverter.Companion.convert(
+    context: Context,
     imageUrl: String,
     block: HeifConverterDsl.() -> Unit = {},
 ): Map<String, Any?> = create(context, imageUrl, block).convert()
 
 public suspend fun HeifConverter.Companion.convert(
     context: Context,
+    imageUrl: String,
+    options: HeifConverter.Options,
+): Map<String, Any?> = create(context, imageUrl, options).convert()
+
+public suspend fun HeifConverter.Companion.convert(
+    context: Context,
     byteArray: ByteArray,
     block: HeifConverterDsl.() -> Unit = {},
 ): Map<String, Any?> = create(context, byteArray, block).convert()
+
+public suspend fun HeifConverter.Companion.convert(
+    context: Context,
+    byteArray: ByteArray,
+    options: HeifConverter.Options,
+): Map<String, Any?> = create(context, byteArray, options).convert()

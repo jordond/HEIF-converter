@@ -4,68 +4,69 @@ import android.content.Context
 import android.graphics.Bitmap
 import androidx.annotation.DrawableRes
 import linc.com.heifconverter.HeifConverter
+import linc.com.heifconverter.HeifConverter.Input
 import java.io.File
 import java.io.InputStream
 
 /**
- * A method for creating a [HeifConverter] with a [File] input and the provided [options].
+ * A DSL builder for creating a [HeifConverter] with a [File] input.
  *
  * Example:
  *
  * ```
- * val options = HeifConverter.Options.build {
+ * val heicFile = File(context.cacheDir, "image.heic")
+ * val converter = HeifConverter.create(context, heicFile) {
  *     saveResultImage = true
- *     outputQuality(50)
- *     outputDirectory(context.cacheDir)
+ *     outputName = "image"
+ *     outputDirectory = File(context.cacheDir)
+ *     outputFormat = HeifConverter.Format.JPEG
  * }
  *
- * val heicFile = File(context.cacheDir, "image.heic")
- * val result = HeifConverter.create(context, heicFile, options).convert()
+ * val result = converter.convert()
  * ```
  *
  * @param[context] [Context] reference to initialize [HeifConverter].
  * @param[file] Input HEIC [File].
- * @param[options] Custom [HeifConverter.Options] for [HeifConverter].
+ * @param[block] A lambda scoped to [HeifConverterDsl] for building a [HeifConverter].
  * @return A [HeifConverterInstance] for converting the [file].
  * @see HeifConverterDsl for all available options.
  */
 public fun HeifConverter.Companion.create(
     context: Context,
     file: File,
-    options: HeifConverter.Options,
+    block: HeifConverterDsl.() -> Unit = {},
 ): HeifConverterInstance = HeifConverterInstance(
-    converter = createConverter(context, HeifConverter.Input.File(file), options)
+    converter = createConverter(context, Input.File(file), block)
 )
 
 /**
- * A method for creating a [HeifConverter] with a [InputStream] input and the provided [options].
+ * A DSL builder for creating a [HeifConverter] with a [InputStream] input.
  *
  * Example:
  *
  * ```
- * val options = HeifConverter.Options.build {
- *     saveResultImage = true
- *     outputQuality(50)
- *     outputDirectory(context.cacheDir)
- * }
- *
  * File(context.cacheDir, "image.heic").inputStream().use { inputStream ->
- *     val result = HeifConverter.create(context, heicFile, options).convert()
+ *     val converter = HeifConverter.create(context, inputStream) {
+ *         saveResultImage = true
+ *         outputDirectory = File(context.cacheDir)
+ *     }
+ *
+ *     val result = converter.convert()
  * }
  * ```
  *
  * @param[context] [Context] reference to initialize [HeifConverter].
  * @param[inputStream] Input HEIC as an [InputStream].
- * @param[options] Custom [HeifConverter.Options] for [HeifConverter].
+ * @param[block] A lambda scoped to [HeifConverterDsl] for building a [HeifConverter].
  * @return A [HeifConverterInstance] for converting the [inputStream].
  * @see HeifConverterDsl for all available options.
  */
 public fun HeifConverter.Companion.create(
     context: Context,
     inputStream: InputStream,
-    options: HeifConverter.Options,
+    block: HeifConverterDsl.() -> Unit = {},
 ): HeifConverterInstance = HeifConverterInstance(
-    converter = createConverter(context, HeifConverter.Input.InputStream(inputStream), options)
+    converter = createConverter(context, Input.InputStream(inputStream), block)
 )
 
 /**
@@ -74,27 +75,26 @@ public fun HeifConverter.Companion.create(
  * Example:
  *
  * ```
- * val options = HeifConverter.Options.build {
+ * val converter = HeifConverter.create(context, R.drawable.my_heic_image) {
  *     saveResultImage = true
- *     outputQuality(50)
- *     outputDirectory(context.cacheDir)
+ *     outputFormat = HeifConverter.Format.JPEG
  * }
  *
- * val result = HeifConverter.create(context, R.drawable.heic_image, options).convert()
+ * val result = converter.convert()
  * ```
  *
  * @param[context] [Context] reference to initialize [HeifConverter].
  * @param[resId] Input HEIC resource id [Int].
- * @param[options] Custom [HeifConverter.Options] for [HeifConverter].
+ * @param[block] A lambda scoped to [HeifConverterDsl] for building a [HeifConverter].
  * @return A [HeifConverterInstance] for converting the resource [resId].
  * @see HeifConverterDsl for all available options.
  */
 public fun HeifConverter.Companion.create(
     context: Context,
     @DrawableRes resId: Int,
-    options: HeifConverter.Options,
+    block: HeifConverterDsl.() -> Unit = {},
 ): HeifConverterInstance = HeifConverterInstance(
-    converter = createConverter(context, HeifConverter.Input.Resources(resId), options)
+    converter = createConverter(context, Input.Resources(resId), block)
 )
 
 /**
@@ -105,27 +105,26 @@ public fun HeifConverter.Companion.create(
  * Example:
  *
  * ```
- * val options = HeifConverter.Options.build {
+ * val converter = HeifConverter.create(context, "https://sample.com/image.heic") {
  *     saveResultImage = true
- *     outputQuality(50)
- *     outputDirectory(context.cacheDir)
+ *     outputFormat = HeifConverter.Format.JPEG
  * }
  *
- * val result = HeifConverter.create(context, "https://sample.com/image.heic", options).convert()
+ * val result = converter.convert()
  * ```
  *
  * @param[context] [Context] reference to initialize [HeifConverter].
  * @param[imageUrl] A URL pointing to a HEIC file.
- * @param[options] Custom [HeifConverter.Options] for [HeifConverter].
+ * @param[block] A lambda scoped to [HeifConverterDsl] for building a [HeifConverter].
  * @return A [HeifConverterInstance] for downloading and converting the HEIC at [imageUrl].
  * @see HeifConverterDsl for all available options.
  */
 public fun HeifConverter.Companion.create(
     context: Context,
     imageUrl: String,
-    options: HeifConverter.Options,
+    block: HeifConverterDsl.() -> Unit = {},
 ): HeifConverterInstance = HeifConverterInstance(
-    converter = createConverter(context, HeifConverter.Input.Url(imageUrl), options)
+    converter = createConverter(context, Input.Url(imageUrl), block)
 )
 
 /**
@@ -134,32 +133,33 @@ public fun HeifConverter.Companion.create(
  * Example:
  *
  * ```
- * val options = HeifConverter.Options.build {
+ * val heicByteArray = File(context.cacheDir, "image.heic").readBytes()
+ * val converter = HeifConverter.create(context, heicByteArray) {
  *     saveResultImage = true
- *     outputQuality(50)
- *     outputDirectory(context.cacheDir)
+ *     outputDirectory = File(context.cacheDir)
  * }
  *
- * val heicByteArray = File(context.cacheDir, "image.heic").readBytes()
- * val result = HeifConverter.create(context, heicByteArray, options).convert()
+ * val result = converter.convert()
  * ```
  *
  * @param[context] [Context] reference to initialize [HeifConverter].
  * @param[byteArray] Input HEIC data as a [ByteArray].
- * @param[options] Custom [HeifConverter.Options] for [HeifConverter].
+ * @param[block] A lambda scoped to [HeifConverterDsl] for building a [HeifConverter].
  * @return A [HeifConverterInstance] for converting the [byteArray].
  * @see HeifConverterDsl for all available options.
  */
 public fun HeifConverter.Companion.create(
     context: Context,
     byteArray: ByteArray,
-    options: HeifConverter.Options,
+    block: HeifConverterDsl.() -> Unit = {},
 ): HeifConverterInstance = HeifConverterInstance(
-    converter = createConverter(context, HeifConverter.Input.ByteArray(byteArray), options)
+    converter = createConverter(context, Input.ByteArray(byteArray), block)
 )
 
 private fun createConverter(
     context: Context,
-    input: HeifConverter.Input,
-    options: HeifConverter.Options,
-): HeifConverter = InternalHeifConverterDsl(options.copy(input = input)).build(context)
+    input: Input,
+    customizeBlock: HeifConverterDsl.() -> Unit = {},
+): HeifConverter = InternalHeifConverterDsl(HeifConverter.Options(input = input))
+    .apply(customizeBlock)
+    .build(context)
