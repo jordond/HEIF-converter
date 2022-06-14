@@ -30,7 +30,7 @@ internal class Converter constructor(
      * @return Result map containing the [Bitmap] and a path to the saved bitmap..
      * @throws RuntimeException if no input file was provided, see [create].
      */
-    suspend fun convertBlocking(): Map<String, Any?> {
+    suspend fun convert(): Map<String, Any?> {
         val bitmap = withContext(Dispatchers.IO) {
             options.input.createBitmap(context)
         } ?: return createResultMap(null)
@@ -51,7 +51,7 @@ internal class Converter constructor(
     /**
      * Convert the HEIC image to a [Bitmap] asynchronously.
      *
-     * @see convertBlocking
+     * @see convert
      * @param[coroutineScope] Custom [CoroutineScope] for launching the conversion coroutine.
      * @param[block] Lambda for retrieving the results asynchronously.
      * @return Result map containing the [Bitmap] and a path to the saved bitmap.
@@ -61,7 +61,7 @@ internal class Converter constructor(
         coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main),
         block: (result: Map<String, Any?>) -> Unit,
     ): Job = coroutineScope.launch(Dispatchers.Main) {
-        val result = convertBlocking()
+        val result = convert()
         block(result)
     }
 

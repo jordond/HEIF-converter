@@ -238,7 +238,7 @@ public class HeifConverter internal constructor(
      * @return Result map containing the [Bitmap] and a path to the saved bitmap if [saveResultImage] is `true`.
      * @throws IllegalStateException if no input file was provided, see [create].
      */
-    public suspend fun convertBlocking(): Map<String, Any?> = converter.convertBlocking()
+    public suspend fun convertBlocking(): Map<String, Any?> = converter.convert()
 
     /**
      * Convert the HEIC input into a [Bitmap] using a callback to get the results asynchronously.
