@@ -32,15 +32,15 @@ allprojects {
 ``` groovy
 dependencies {
   // Include main library + DSL extensions
-  implementation 'com.github.lincollincol:HEIF-converter:2.0'
+  implementation 'com.github.lincollincol:HEIF-converter:v2.0'
   
   // Or you can add them indiviually
   
   // Main library
-  implementation 'com.github.lincollincol:HEIF-converter:heifconverter:2.0'
+  implementation 'com.github.lincollincol:HEIF-converter:heifconverter:v2.0'
   
   // Optional DSL + extension library
-  implementation 'com.github.lincollincol:HEIF-converter:heifconverter-dsl:2.0'
+  implementation 'com.github.lincollincol:HEIF-converter:heifconverter-dsl:v2.0'
 }
 ```
 
