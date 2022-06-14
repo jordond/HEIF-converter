@@ -270,6 +270,6 @@ private fun createConverter(
     options: HeifConverter.Options = HeifConverter.Options(),
     customizeBlock: HeifConverterDsl.() -> Unit = {},
 ): HeifConverter {
-    val builtOptions = buildOptions(options.copy(input = input), customizeBlock)
+    val builtOptions = buildOptions(options, customizeBlock).copy(input = input)
     return InternalHeifConverterDsl(builtOptions).build(context)
 }
