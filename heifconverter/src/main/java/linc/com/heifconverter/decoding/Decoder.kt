@@ -10,7 +10,7 @@ import java.net.URL
 /**
  * Defines an object that can take the different HEIC input types and convert it to a [Bitmap].
  */
-interface Decoder {
+internal interface Decoder {
 
     suspend fun fromByteArray(byteArray: ByteArray): Bitmap?
 

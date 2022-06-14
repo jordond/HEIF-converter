@@ -41,7 +41,7 @@ internal class Converter constructor(
         }
 
         // Figure out where to save it
-        val outputFile = File(options.pathToSaveDirectory, options.outputFileName)
+        val outputFile = File(options.pathToSaveDirectory, options.outputFileNameWithFormat)
 
         // Save the bitmap and trigger callback
         val savedFilePath = bitmap.saveToFile(outputFile)
@@ -96,10 +96,12 @@ internal class Converter constructor(
      * @throws RuntimeException if file was not saved.
      */
     private suspend fun Bitmap.saveToFile(outputFile: File): String = withContext(Dispatchers.IO) {
+        val quality = options.outputQuality.coerceIn(0..100)
+
         val result = runCatching {
             FileOutputStream(outputFile).use { outputStream ->
                 val format = useFormat(options.outputFormat)
-                compress(format, options.outputQuality, outputStream)
+                compress(format, quality, outputStream)
             }
         }
 

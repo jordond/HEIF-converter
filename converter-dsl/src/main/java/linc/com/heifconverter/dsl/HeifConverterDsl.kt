@@ -41,6 +41,9 @@ import java.io.File
  *     outputQuality(50)
  *     outputDirectory(context.cacheDir)
  * }
+ *
+ * val heicFile = File(context.cacheDir, "image.heic")
+ * val result = HeifConverter.convert(context, heicFile, options)
  * ```
  */
 public interface HeifConverterDsl {
@@ -152,13 +155,13 @@ internal class InternalHeifConverterDsl(
     }
 
     override fun outputQuality(quality: Int) {
-        options = options.copy(outputQuality = quality)
+        options = options.copy(outputQuality = quality.coerceIn(0..100))
     }
 
     override var outputName: String
         get() = options.outputFileName
         set(value) {
-            options = options.copy(convertedFileName = value)
+            options = options.copy(outputFileName = value)
         }
 
     override fun outputName(fileName: String) {

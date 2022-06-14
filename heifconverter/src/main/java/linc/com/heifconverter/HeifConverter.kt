@@ -25,8 +25,7 @@ import java.util.*
  * @see create
  * @constructor Converter with all default options.
  */
-@Suppress("MemberVisibilityCanBePrivate", "unused")
-class HeifConverter internal constructor(
+public class HeifConverter internal constructor(
     private val context: Context,
     private var options: Options,
 ) {
@@ -49,7 +48,7 @@ class HeifConverter internal constructor(
      * @param[pathToFile] Absolute filepath to the image.
      * @throws FileNotFoundException if [pathToFile] doesn't point to an accessible existing file.
      */
-    fun fromFile(pathToFile: String) = fromFile(File(pathToFile))
+    public fun fromFile(pathToFile: String): HeifConverter = fromFile(File(pathToFile))
 
     /**
      * Use a [File] object for loading the HEIC file.
@@ -58,7 +57,7 @@ class HeifConverter internal constructor(
      * @param[file] [File] object pointing to the HEIC image.
      * @throws FileNotFoundException if [file] doesn't point to an accessible existing file.
      */
-    fun fromFile(file: File) = apply {
+    public fun fromFile(file: File): HeifConverter = apply {
         if (!file.exists()) {
             throw FileNotFoundException("HEIC file not found! ${file.absolutePath}")
         }
@@ -71,7 +70,7 @@ class HeifConverter internal constructor(
      *
      * @param[inputStream] [InputStream] for HEIC image.
      */
-    fun fromInputStream(inputStream: InputStream) = apply {
+    public fun fromInputStream(inputStream: InputStream): HeifConverter = apply {
         updateOptions { copy(input = Input.InputStream(inputStream)) }
     }
 
@@ -81,7 +80,7 @@ class HeifConverter internal constructor(
      * @param[resId] A [DrawableRes] ID for your HEIC image.
      * @throws FileNotFoundException if the [resId] is not valid.
      */
-    fun fromResource(@DrawableRes resId: Int) = apply {
+    public fun fromResource(@DrawableRes resId: Int): HeifConverter = apply {
         val isResValid = context.resources.getIdentifier(
             context.resources.getResourceName(resId),
             "drawable",
@@ -102,7 +101,7 @@ class HeifConverter internal constructor(
      *
      * @param[heicImageUrl] URL pointing to an HEIC file.
      */
-    fun fromUrl(heicImageUrl: String) = apply {
+    public fun fromUrl(heicImageUrl: String): HeifConverter = apply {
         updateOptions { copy(input = Input.Url(heicImageUrl)) }
     }
 
@@ -112,7 +111,7 @@ class HeifConverter internal constructor(
      * @param[data] [ByteArray] containing the HEIC data.
      * @throws FileNotFoundException if [data] is empty.
      */
-    fun fromByteArray(data: ByteArray) = apply {
+    public fun fromByteArray(data: ByteArray): HeifConverter = apply {
         if (data.isEmpty()) {
             throw FileNotFoundException("Empty byte array!")
         }
@@ -127,7 +126,7 @@ class HeifConverter internal constructor(
      *
      * @param[saveResultImage] Whether or not to save the bitmap to the disk
      */
-    fun saveResultImage(saveResultImage: Boolean) = apply {
+    public fun saveResultImage(saveResultImage: Boolean): HeifConverter = apply {
         updateOptions { copy(saveResultImage = saveResultImage) }
     }
 
@@ -139,7 +138,7 @@ class HeifConverter internal constructor(
      * @param[format] The [Format] to use for the output.
      * @see saveResultImage
      */
-    fun withOutputFormat(format: Format) = apply {
+    public fun withOutputFormat(format: Format): HeifConverter = apply {
         updateOptions { copy(outputFormat = format) }
     }
 
@@ -151,7 +150,8 @@ class HeifConverter internal constructor(
      * @see saveResultImage
      */
     @Deprecated("In favour of explicit format objects", ReplaceWith("withOutputFormat()"))
-    fun withOutputFormat(format: String) = withOutputFormat(Format.fromString(format))
+    public fun withOutputFormat(format: String): HeifConverter =
+        withOutputFormat(Format.fromString(format))
 
     /**
      * Set the quality of the saved file. Default: 100
@@ -161,7 +161,9 @@ class HeifConverter internal constructor(
      * @param[quality] A quality value between 0 and 100.
      * @see saveResultImage
      */
-    fun withOutputQuality(@IntRange(from = 0, to = 100) quality: Int) = apply {
+    public fun withOutputQuality(
+        @IntRange(from = 0, to = 100) quality: Int,
+    ): HeifConverter = apply {
         updateOptions {
             copy(outputQuality = quality.coerceIn(0..100))
         }
@@ -173,8 +175,8 @@ class HeifConverter internal constructor(
      * @param[convertedFileName] Filename to use for saving the result.
      * @see saveResultImage
      */
-    fun saveFileWithName(convertedFileName: String) = apply {
-        updateOptions { copy(convertedFileName = convertedFileName) }
+    public fun saveFileWithName(convertedFileName: String): HeifConverter = apply {
+        updateOptions { copy(outputFileName = convertedFileName) }
     }
 
     /**
@@ -184,7 +186,7 @@ class HeifConverter internal constructor(
      * @throws FileNotFoundException if the [File] does not exist.
      * @throws IllegalArgumentException if [File] is not a directory.
      */
-    fun saveToDirectory(directory: File) = apply {
+    public fun saveToDirectory(directory: File): HeifConverter = apply {
         if (!directory.exists()) throw FileNotFoundException("Directory not found!")
         else if (!directory.isDirectory) {
             throw IllegalArgumentException("${directory.absolutePath} is not a directory!")
@@ -202,7 +204,8 @@ class HeifConverter internal constructor(
      * @throws FileNotFoundException if the created [File] does not exist.
      * @throws IllegalArgumentException if created [File] is not a directory.
      */
-    fun saveToDirectory(pathToDirectory: String) = saveToDirectory(File(pathToDirectory))
+    public fun saveToDirectory(pathToDirectory: String): HeifConverter =
+        saveToDirectory(File(pathToDirectory))
 
     /**
      * Convert the HEIC input into a [Bitmap].
@@ -215,7 +218,7 @@ class HeifConverter internal constructor(
      * @see convertBlocking for synchronous conversion.
      */
     @Deprecated("You should really use convertBlocking or convert {}", ReplaceWith("convert { }"))
-    fun convert(): Job = converter.convert {}
+    public fun convert(): Job = converter.convert {}
 
     /**
      * Convert the HEIC input into a [Bitmap] using coroutines to get the result synchronously.
@@ -235,7 +238,7 @@ class HeifConverter internal constructor(
      * @return Result map containing the [Bitmap] and a path to the saved bitmap if [saveResultImage] is `true`.
      * @throws IllegalStateException if no input file was provided, see [create].
      */
-    suspend fun convertBlocking(): Map<String, Any?> = converter.convertBlocking()
+    public suspend fun convertBlocking(): Map<String, Any?> = converter.convertBlocking()
 
     /**
      * Convert the HEIC input into a [Bitmap] using a callback to get the results asynchronously.
@@ -247,7 +250,7 @@ class HeifConverter internal constructor(
      * @return The [Job] used to launch the conversion coroutine.
      * @throws IllegalStateException if no input file was provided, see [create].
      */
-    fun convert(
+    public fun convert(
         coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main),
         block: (result: Map<String, Any?>) -> Unit,
     ): Job = converter.convert(coroutineScope, block)
@@ -263,26 +266,26 @@ class HeifConverter internal constructor(
      * @property[saveResultImage] Save the converted [Bitmap] to the device. See [saveResultImage].
      * @property[outputQuality] The quality of the saved image. See [withOutputQuality].
      * @property[outputFormat] Format of the saved image. See [withOutputFormat].
-     * @property[convertedFileName] The file name for the saved image. See [saveFileWithName].
+     * @property[outputFileName] The file name for the saved image. See [saveFileWithName].
      * @property[pathToSaveDirectory] The folder to save converted image to. See [saveToDirectory].
      */
-    data class Options constructor(
+    public data class Options constructor(
         val input: Input = None,
         val saveResultImage: Boolean = true,
         val outputQuality: Int = 100,
         val outputFormat: Format = Format.JPEG,
-        val convertedFileName: String = UUID.randomUUID().toString(),
+        val outputFileName: String = UUID.randomUUID().toString(),
         val pathToSaveDirectory: File? = null,
     ) {
 
-        val outputFileName = "${convertedFileName}${outputFormat}"
+        internal val outputFileNameWithFormat = "${outputFileName}${outputFormat}"
 
-        companion object {
+        public companion object {
 
             /**
              * Get a [File] reference for the default output path.
              */
-            fun defaultOutputPath(context: Context): File? {
+            public fun defaultOutputPath(context: Context): File? {
                 val path = ContextCompat.getExternalFilesDirs(
                     context,
                     Environment.DIRECTORY_DCIM
@@ -296,12 +299,12 @@ class HeifConverter internal constructor(
     /**
      * The supported output formats when saving the HEIF converted Bitmap to the disk.
      */
-    sealed class Format(val extension: String) {
-        object JPEG : Format(".jpg")
-        object PNG : Format(".png")
-        object WEBP : Format(".webp")
+    public sealed class Format(public val extension: String) {
+        public object JPEG : Format(".jpg")
+        public object PNG : Format(".png")
+        public object WEBP : Format(".webp")
 
-        companion object {
+        internal companion object {
 
             /**
              * Map a [String] value to a [Format] object, default to [JPEG] if the string
@@ -322,9 +325,9 @@ class HeifConverter internal constructor(
     /**
      * Key accessors for getting the results from [convert] or [convertBlocking]
      */
-    object Key {
-        const val BITMAP = "converted_bitmap_heic"
-        const val IMAGE_PATH = "path_to_converted_heic"
+    public object Key {
+        public const val BITMAP: String = "converted_bitmap_heic"
+        public const val IMAGE_PATH: String = "path_to_converted_heic"
     }
 
     /**
@@ -333,16 +336,16 @@ class HeifConverter internal constructor(
      * **Note**: [None] is the default when constructing an [Options] object but an exception
      * will be thrown when trying to convert.
      */
-    sealed class Input {
-        class File(val data: java.io.File) : Input()
-        class Url(val data: String) : Input()
-        class Resources(@DrawableRes val data: Int) : Input()
-        class InputStream(val data: java.io.InputStream) : Input()
-        class ByteArray(val data: kotlin.ByteArray) : Input()
-        object None : Input()
+    public sealed class Input {
+        public class File(public val data: java.io.File) : Input()
+        public class Url(public val data: String) : Input()
+        public class Resources(@DrawableRes public val data: Int) : Input()
+        public class InputStream(public val data: java.io.InputStream) : Input()
+        public class ByteArray(public val data: kotlin.ByteArray) : Input()
+        public object None : Input()
     }
 
-    companion object {
+    public companion object {
 
         /**
          * Convert a HEIF image from a HEIC file into a [Bitmap].
@@ -353,7 +356,7 @@ class HeifConverter internal constructor(
             "In favour of new HeifConverter.with()",
             ReplaceWith("HeifConverter.with(context)"),
         )
-        fun useContext(context: Context) = create(context)
+        public fun useContext(context: Context): HeifConverter = create(context)
 
         /**
          * Create a builder for converting a HEIF image from a HEIC file into a [Bitmap].
@@ -392,9 +395,9 @@ class HeifConverter internal constructor(
          * **Warning:** If you do not call one of the input methods a [IllegalStateException] will
          * be thrown when [convert] or [convertBlocking] is invoked.
          */
-        fun create(
+        public fun create(
             context: Context,
             options: Options = Options(),
-        ) = HeifConverter(context, options)
+        ): HeifConverter = HeifConverter(context, options)
     }
 }
