@@ -112,6 +112,23 @@ val result = HeifConverter.convert(context, inputUrl) {
 There are `HeifConverter.convert` extension functions for each input type. `File`, `InputStream`
 , `ByteArray`, etc.
 
+You can also pass in a `HeifConverter.Options` object to each of the DSL extensions:
+
+```kotlin
+class SampleClass(context: Context) {
+    private val convertOptions = HeifConverter.Options.build {
+        saveResultImage = true
+        outputQuality(50)
+        outputDirectory(context.cacheDir)
+    }
+
+    suspend fun convertImage(url: String): Bitmap? {
+        val result = HeifConverter.create(context, url, convertOptions).convert()
+        return result.bitmap
+    }
+}
+```
+
 ### convert function
 
 * Lambda, inside convert method, will return map of Objects. If you want to get result bitmap, you

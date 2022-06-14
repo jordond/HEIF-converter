@@ -64,14 +64,14 @@ public interface HeifConverterDsl {
      *
      * @see HeifConverter.withOutputFormat
      */
-    public var outputFormat: HeifConverter.Format
+    public var outputFormat: Format
 
     /**
      * Set output image for when saving the result [Bitmap] to the disk. Default: [Format.JPEG].
      *
      * @see HeifConverter.withOutputFormat
      */
-    public fun outputFormat(format: HeifConverter.Format)
+    public fun outputFormat(format: Format)
 
     /**
      * Set the quality of the saved file. Default: 100
@@ -141,13 +141,13 @@ internal class InternalHeifConverterDsl(
         this.saveResultImage = saveResultImage
     }
 
-    override var outputFormat: HeifConverter.Format
+    override var outputFormat: Format
         get() = options.outputFormat
         set(value) {
             options = options.copy(outputFormat = value)
         }
 
-    override fun outputFormat(format: HeifConverter.Format) {
+    override fun outputFormat(format: Format) {
         this.outputFormat = format
     }
 

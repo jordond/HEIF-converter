@@ -26,4 +26,9 @@ import linc.com.heifconverter.dsl.InternalHeifConverterDsl
 public fun HeifConverter.Options.Companion.build(
     options: HeifConverter.Options = HeifConverter.Options(),
     block: HeifConverterDsl.() -> Unit = {},
+): HeifConverter.Options = buildOptions(options, block)
+
+internal fun buildOptions(
+    options: HeifConverter.Options = HeifConverter.Options(),
+    block: HeifConverterDsl.() -> Unit = {},
 ): HeifConverter.Options = InternalHeifConverterDsl(options).apply(block).options
