@@ -1,4 +1,4 @@
-package linc.com.heifconverter.iso14496.part12
+package linc.com.heifconverter.decoding.legacy.iso14496.part12
 
 import org.mp4parser.BoxParser
 import org.mp4parser.support.AbstractBox
@@ -8,8 +8,7 @@ import java.nio.ByteBuffer
 import java.nio.channels.ReadableByteChannel
 import java.nio.channels.WritableByteChannel
 
-internal class ItemPropertyContainerBox :
-    AbstractContainerBox(TYPE) {
+internal class ItemPropertiesBox : AbstractContainerBox(TYPE) {
     @Throws(IOException::class)
     override fun parse(
         dataSource: ReadableByteChannel,
@@ -35,6 +34,6 @@ internal class ItemPropertyContainerBox :
     }
 
     companion object {
-        const val TYPE = "ipco"
+        const val TYPE = "iprp"
     }
 }

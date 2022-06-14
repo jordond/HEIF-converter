@@ -2,17 +2,27 @@
 
 buildscript {
     ext.kotlin_version = '1.6.21'
+    ext.coroutines_version = "1.6.2"
+    ext.parser_version = "1.9.41"
+
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.2.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
+}
+
+ext {
+    minSdkVersion = 21
+    targetSdkVersion = 32
+    compileSdkVersion = 32
+    buildToolsVersion = '30.0.3'
 }
 
 allprojects {

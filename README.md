@@ -13,12 +13,13 @@
 Converter for High Efficiency Image Format(HEIF) to other image format
 
 ## Available formats
-* JPEG  
-* PNG  
-* WEBP  
+
+* JPEG
+* PNG
+* WEBP
 
 ## Download
-### Gradle
+
 ``` groovy
 allprojects {
   repositories {
@@ -27,72 +28,148 @@ allprojects {
   }
 }
 ```
+
 ``` groovy
 dependencies {
-  implementation 'com.github.lincollincol:HEIF-converter:1.5'
+  // Include main library + DSL extensions
+  implementation 'com.github.lincollincol:HEIF-converter:2.0'
+  
+  // Or you can add them indiviually
+  
+  // Main library
+  implementation 'com.github.lincollincol:HEIF-converter:heifconverter:2.0'
+  
+  // Optional DSL + extension library
+  implementation 'com.github.lincollincol:HEIF-converter:heifconverter-dsl:2.0'
 }
-```  
-
-### Maven
-``` xml
-<repositories>
-  <repository>
-    <id>jitpack.io</id>
-    <url>https://jitpack.io</url>
-  </repository>
-</repositories>
-```
-``` xml
-<dependency>
-  <groupId>com.github.lincollincol</groupId>
-  <artifactId>Repo</artifactId>
-  <version>1.5</version>
-</dependency>
 ```
 
 ## Usage
-``` kotlin
-HeifConverter.useContext(this)
-                .fromUrl("https://github.com/nokiatech/heif/raw/gh-pages/content/images/crowd_1440x960.heic")
-                .withOutputFormat(HeifConverter.Format.PNG)
-                .withOutputQuality(100) // optional - default value = 100. Available range (0 .. 100)
-                .saveFileWithName("Image_Converted_Name_2") // optional - default value = uuid random string
-                .saveResultImage(true) // optional - default value = true
-                .convert {
-                    println(it[HeifConverter.Key.IMAGE_PATH] as String)
-                    resultImage.setImageBitmap((it[HeifConverter.Key.BITMAP] as Bitmap))
-                }
-```
-### convert function
-* Lambda, inside convert method, will return map of Objects. 
-If you want to get result bitmap, you need to get value by libarry key ``` HeifConverter.Key.BITMAP ``` and cast it to Bitmap
 
-* If you need path to converted image - use ``` HeifConverter.Key.IMAGE_PATH ``` key and cast map value to String.
+### Builder syntax
+
+```kotlin
+HeifConverter.useContext(this)
+    .fromUrl("https://github.com/nokiatech/heif/raw/gh-pages/content/images/crowd_1440x960.heic")
+    .withOutputFormat(HeifConverter.Format.PNG)
+    .withOutputQuality(100) // optional - default value = 100. Available range (0 .. 100)
+    .saveFileWithName("Image_Converted_Name_2") // optional - default value = uuid random string
+    .saveResultImage(true) // optional - default value = true
+    .convert {
+        println(it[HeifConverter.Key.IMAGE_PATH] as String)
+        resultImage.setImageBitmap((it[HeifConverter.Key.BITMAP] as Bitmap))
+    }
+```
+
+### DSL + extension syntax
+
+**Note:** Make sure you include the `heifconverter-dsl` dependency!
+
+Unlike the above builder syntax which returns a `Map<String, Any?>` all of the DSL and extension
+methods return a `HeifConverterResult` class.
+
+Using `HeifConverter.create`:
+
+```kotlin
+val inputUrl = "https://github.com/nokiatech/heif/raw/gh-pages/content/images/crowd_1440x960.heic"
+val converter = HeifConverter.create(this, inputUrl) {
+    saveResultImage(true)
+    outputFormat(HeifConverter.Format.PNG)
+    outputQuality(50)
+    outputName("Image_Converted_Name")
+}
+
+// Using Coroutines
+val (bitmap, imagePath) = converter.convert()
+if (bitmap != null) {
+    // do something with bitmap
+}
+
+// Using Callback
+converter.convert(lifecycleScope /* optional coroutine scope */) { (bitmap, imagePath) ->
+    if (bitmap != null) {
+        // do something with bitmap
+    }
+}
+```
+
+There are `HeifConverter.create` extension functions for each input type. `File`, `InputStream`
+, `ByteArray`, etc.
+
+If you want to skip the step of creating a `HeifConverter` instance you can use
+the `HeifConverter.convert` extensions instead:
+
+```kotlin
+val inputUrl = "https://github.com/nokiatech/heif/raw/gh-pages/content/images/crowd_1440x960.heic"
+val result = HeifConverter.convert(context, inputUrl) {
+    saveResultImage = true
+    outputName = "Image_Converted_Name"
+    outputDirectory = File(context.cacheDir)
+    outputFormat = HeifConverter.Format.JPEG
+}
+```
+
+There are `HeifConverter.convert` extension functions for each input type. `File`, `InputStream`
+, `ByteArray`, etc.
+
+You can also pass in a `HeifConverter.Options` object to each of the DSL extensions:
+
+```kotlin
+class SampleClass(context: Context) {
+    private val convertOptions = HeifConverter.Options.build {
+        saveResultImage = true
+        outputQuality(50)
+        outputDirectory(context.cacheDir)
+    }
+
+    suspend fun convertImage(url: String): Bitmap? {
+        val result = HeifConverter.create(context, url, convertOptions).convert()
+        return result.bitmap
+    }
+}
+```
+
+### convert function
+
+* Lambda, inside convert method, will return map of Objects. If you want to get result bitmap, you
+  need to get value by library key ``` HeifConverter.Key.BITMAP ``` and cast it to Bitmap
+
+* If you need path to converted image - use ``` HeifConverter.Key.IMAGE_PATH ``` key and cast map
+  value to String.
 
 ### saveResultImage function
+
 * Set false, if you need bitmap only without saving.
 * You can skip this function if you want to save converted image, because it is true by default
 
 ### saveFileWithName function
+
 * Use custom file name.
-* Skip this function if you don't need custom converted image name, because UUID generate unique name by default. 
+* Skip this function if you don't need custom converted image name, because UUID generate unique
+  name by default.
 
 ### withOutputQuality function
+
 * Use this function if you need custom output quality.
 * Skip this function if you don't need custom output quality, default quality - 100
 
 ### withOutputFormat function
+
 * Set output image format.
 * Use values from HeifConverter.Format. (Current available: PNG, JPEG, WEBP).
 
 ### from (Source)
+
 * Convert heic image from sources such file, url, bytes, input stream etc.
-* You can call this function only one time. If you call this function few times - converter will use last called source.
+* You can call this function only one time. If you call this function few times - converter will use
+  last called source.
 
 ## Based on
+
 <a href="https://github.com/yohhoy/heifreader">heifreader by yohhoy</a>
 
 ## License
+
 ```
 MIT License
 

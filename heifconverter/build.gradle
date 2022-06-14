@@ -2,12 +2,12 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 32
-    buildToolsVersion "30.0.3"
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 32
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
@@ -24,6 +24,10 @@ android {
         sourceCompatibility 1.8
         targetCompatibility 1.8
     }
+
+    kotlinOptions {
+        freeCompilerArgs += '-Xexplicit-api=strict'
+    }
 }
 
 dependencies {
@@ -36,12 +40,10 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.8.0'
 
     // Parsing
-    def parser_version = "1.9.41"
     implementation "org.mp4parser:isoparser:$parser_version"
     implementation "org.slf4j:slf4j-simple:1.6.1"
 
     // Coroutines
-    def coroutines_version = "1.6.2"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
 
