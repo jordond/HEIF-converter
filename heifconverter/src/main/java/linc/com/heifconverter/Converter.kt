@@ -49,7 +49,7 @@ internal class Converter constructor(
     }
 
     /**
-     * Conver the HEIC image to a [Bitmap] asynchronously.
+     * Convert the HEIC image to a [Bitmap] asynchronously.
      *
      * @see convertBlocking
      * @param[coroutineScope] Custom [CoroutineScope] for launching the conversion coroutine.
