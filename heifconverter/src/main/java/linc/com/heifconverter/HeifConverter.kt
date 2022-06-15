@@ -31,18 +31,6 @@ public class HeifConverter internal constructor(
 ) {
 
     /**
-     * Will throw an [IllegalArgumentException] if invoked before [Options.input] is set.
-     */
-    private val converter: Converter
-        get() {
-            if (options.input is None) throw IllegalArgumentException(
-                "No input type was provided! Use .fromFile, fromUrl, fromInputStream, etc!",
-            )
-
-            return Converter(context = context, options)
-        }
-
-    /**
      * Use an absolute file path for loading the HEIC file.
      *
      * @param[pathToFile] Absolute filepath to the image.
@@ -218,7 +206,7 @@ public class HeifConverter internal constructor(
      * @see convertBlocking for synchronous conversion.
      */
     @Deprecated("You should really use convertBlocking or convert {}", ReplaceWith("convert { }"))
-    public fun convert(): Job = converter.convert {}
+    public fun convert(): Job = converter().convert {}
 
     /**
      * Convert the HEIC input into a [Bitmap] using coroutines to get the result synchronously.
@@ -238,7 +226,7 @@ public class HeifConverter internal constructor(
      * @return Result map containing the [Bitmap] and a path to the saved bitmap if [saveResultImage] is `true`.
      * @throws IllegalStateException if no input file was provided, see [create].
      */
-    public suspend fun convertBlocking(): Map<String, Any?> = converter.convert()
+    public suspend fun convertBlocking(): Map<String, Any?> = converter().convert()
 
     /**
      * Convert the HEIC input into a [Bitmap] using a callback to get the results asynchronously.
@@ -253,10 +241,25 @@ public class HeifConverter internal constructor(
     public fun convert(
         coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main),
         block: (result: Map<String, Any?>) -> Unit,
-    ): Job = converter.convert(coroutineScope, block)
+    ): Job = converter().convert(coroutineScope, block)
 
     private fun updateOptions(block: Options.() -> Options) {
         options = options.run(block)
+    }
+
+    /**
+     * Will throw an [IllegalArgumentException] if invoked before [Options.input] is set.
+     */
+    private fun converter(): Converter {
+        if (options.input is None) throw IllegalArgumentException(
+            "No input type was provided! Use .fromFile, fromUrl, fromInputStream, etc!",
+        )
+
+        if (options.saveResultImage && options.pathToSaveDirectory == null) {
+            updateOptions { copy(pathToSaveDirectory = Options.defaultOutputPath(context)) }
+        }
+
+        return Converter(context, options)
     }
 
     /**
@@ -278,7 +281,7 @@ public class HeifConverter internal constructor(
         val pathToSaveDirectory: File? = null,
     ) {
 
-        internal val outputFileNameWithFormat = "${outputFileName}${outputFormat}"
+        internal val outputFileNameWithFormat = "${outputFileName}${outputFormat.extension}"
 
         public companion object {
 
