@@ -1,4 +1,4 @@
-package linc.com.heifconverter.decoding
+package linc.com.heifconverter.decoder
 
 import android.content.Context
 import android.graphics.Bitmap

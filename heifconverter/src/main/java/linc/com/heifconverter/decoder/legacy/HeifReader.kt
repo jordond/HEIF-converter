@@ -1,4 +1,4 @@
-package linc.com.heifconverter.decoding.legacy
+package linc.com.heifconverter.decoder.legacy
 
 import android.content.Context
 import android.content.res.Resources
@@ -15,8 +15,8 @@ import android.util.Size
 import android.view.Surface
 import kotlinx.coroutines.*
 import linc.com.heifconverter.ScriptC_yuv2rgb
-import linc.com.heifconverter.decoding.legacy.iso14496.part12.*
-import linc.com.heifconverter.decoding.legacy.iso23008.part12.ImageSpatialExtentsBox
+import linc.com.heifconverter.decoder.legacy.iso14496.part12.*
+import linc.com.heifconverter.decoder.legacy.iso23008.part12.ImageSpatialExtentsBox
 import org.mp4parser.Box
 import org.mp4parser.IsoFile
 import org.mp4parser.boxes.iso14496.part12.FileTypeBox

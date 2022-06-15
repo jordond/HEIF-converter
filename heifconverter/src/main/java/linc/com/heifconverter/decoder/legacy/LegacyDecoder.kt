@@ -1,7 +1,7 @@
-package linc.com.heifconverter.decoding.legacy
+package linc.com.heifconverter.decoder.legacy
 
 import android.content.Context
-import linc.com.heifconverter.decoding.Decoder
+import linc.com.heifconverter.decoder.Decoder
 import java.io.File
 import java.io.InputStream
 
