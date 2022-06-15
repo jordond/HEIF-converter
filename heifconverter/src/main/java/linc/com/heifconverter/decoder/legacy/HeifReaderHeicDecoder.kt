@@ -8,7 +8,7 @@ import java.io.InputStream
 /**
  * A [HeicDecoder] for Android P and below, using the [HeifReader] to convert the files.
  */
-internal class LegacyHeicDecoder(private val context: Context) : HeicDecoder {
+internal class HeifReaderHeicDecoder(private val context: Context) : HeicDecoder {
 
     private val reader: HeifReader
         get() = HeifReader(context)

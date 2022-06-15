@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.scale
 import androidx.lifecycle.lifecycleScope
 import linc.com.heifconverter.HeifConverter
-import linc.com.heifconverter.decoder.glide.GlideDecoder
+import linc.com.heifconverter.decoder.glide.GlideHeicDecoder
 import linc.com.heifconverter.dsl.HeifConverterResult
 import linc.com.heifconverter.dsl.extension.create
 
@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
                 outputQuality(100)
                 outputName("Image_Converted_Name")
                 saveResultImage(true)
-                customDecoder(GlideDecoder(context = this@MainActivity))
+                customDecoder(GlideHeicDecoder(context = this@MainActivity))
             }
             .convert(lifecycleScope) { result ->
                 stop()

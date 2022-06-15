@@ -12,7 +12,7 @@ import java.io.InputStream
  * [HeicDecoder] class for Android Q and higher.
  */
 @RequiresApi(Build.VERSION_CODES.Q)
-internal class ModernHeicDecoder(private val context: Context) : HeicDecoder {
+internal class BitmapFactoryHeicDecoder(private val context: Context) : HeicDecoder {
 
     override suspend fun fromByteArray(byteArray: ByteArray): Bitmap? {
         val bitmapOptions = BitmapFactory.Options().apply {

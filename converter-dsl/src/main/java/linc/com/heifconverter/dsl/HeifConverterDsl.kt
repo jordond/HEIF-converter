@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import androidx.annotation.IntRange
 import linc.com.heifconverter.HeifConverter
 import linc.com.heifconverter.HeifConverter.Format
+import linc.com.heifconverter.HeifConverter.Input
 import linc.com.heifconverter.decoder.HeicDecoder
 import java.io.File
 
@@ -45,6 +46,26 @@ import java.io.File
  *
  * val heicFile = File(context.cacheDir, "image.heic")
  * val result = HeifConverter.convert(context, heicFile, options)
+ * ```
+ *
+ * Using a custom [HeicDecoder]:
+ *
+ * ```
+ * val heicFile = File(context.cacheDir, "image.heic")
+ * val result = HeifConverter.convert(context, heicFile) {
+ *     customDecoder = object : HeicDecoder() {
+ *         // implementation
+ *     }
+ * }
+ * ```
+ *
+ * Or using `decoder-glide`
+ *
+ * ```
+ *  val heicFile = File(context.cacheDir, "image.heic")
+ * val result = HeifConverter.convert(context, heicFile) {
+ *     customDecoder = GlideHeicDecoder(context)
+ * }
  * ```
  */
 public interface HeifConverterDsl {
@@ -130,9 +151,27 @@ public interface HeifConverterDsl {
      */
     public fun useDefaultOutputPath(context: Context)
 
-    public fun customDecoder(decoder: HeicDecoder)
+    /**
+     * A custom decoder for converting a HEIC [Input] to a [Bitmap].
+     *
+     * @see HeifConverter.setCustomDecoder
+     */
+    public var customDecoder: HeicDecoder?
+
+    /**
+     * A custom decoder for converting a HEIC [Input] to a [Bitmap].
+     *
+     * @see HeifConverter.setCustomDecoder
+     */
+    public fun customDecoder(decoder: HeicDecoder?)
 }
 
+/**
+ * Internal implementation of [HeifConverterDsl].
+ *
+ * @property[options] [HeifConverter.Options] object to initialize the builder.
+ * @constructor Builder with defaults.
+ */
 internal class InternalHeifConverterDsl(
     internal var options: HeifConverter.Options = HeifConverter.Options(),
 ) : HeifConverterDsl {
@@ -186,7 +225,13 @@ internal class InternalHeifConverterDsl(
         options = options.copy(pathToSaveDirectory = path)
     }
 
-    override fun customDecoder(decoder: HeicDecoder) {
+    override var customDecoder: HeicDecoder?
+        get() = options.decoder
+        set(value) {
+            options = options.copy(decoder = value)
+        }
+
+    override fun customDecoder(decoder: HeicDecoder?) {
         options = options.copy(decoder = decoder)
     }
 

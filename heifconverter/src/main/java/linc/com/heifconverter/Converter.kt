@@ -13,9 +13,8 @@ import linc.com.heifconverter.HeifConverter.Format
 import linc.com.heifconverter.HeifConverter.Input
 import linc.com.heifconverter.HeifConverter.Key
 import linc.com.heifconverter.HeifConverter.Options
+import linc.com.heifconverter.decoder.DefaultHeicDecoder
 import linc.com.heifconverter.decoder.HeicDecoder
-import linc.com.heifconverter.decoder.ModernHeicDecoder
-import linc.com.heifconverter.decoder.legacy.LegacyHeicDecoder
 import java.io.File
 import java.io.FileOutputStream
 
@@ -69,9 +68,7 @@ internal class Converter constructor(
      * Create the [Bitmap] using a [HeicDecoder] based on the Android OS level.
      */
     private suspend fun Input.createBitmap(context: Context, options: Options): Bitmap? {
-        val heicDecoder: HeicDecoder = options.decoder
-            ?: if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ModernHeicDecoder(context)
-            else LegacyHeicDecoder(context)
+        val heicDecoder: HeicDecoder = options.decoder ?: DefaultHeicDecoder(context)
 
         return when (this) {
             is Input.ByteArray -> heicDecoder.fromByteArray(data)

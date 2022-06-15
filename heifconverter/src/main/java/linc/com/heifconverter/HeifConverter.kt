@@ -197,6 +197,16 @@ public class HeifConverter internal constructor(
         saveToDirectory(File(pathToDirectory))
 
     /**
+     * Set a custom [HeicDecoder] for decoding the HEIC [Input] to a [Bitmap].
+     *
+     * @param[heicDecoder] A custom [HeicDecoder] implementation for decoding HEIC. If `null` then
+     * the default decoder will be used.
+     */
+    public fun setCustomDecoder(heicDecoder: HeicDecoder?): HeifConverter = apply {
+        updateOptions { copy(decoder = heicDecoder) }
+    }
+
+    /**
      * Convert the HEIC input into a [Bitmap].
      *
      * There is no way of tracking the saved file or accessing the generated [Bitmap]. For that
@@ -272,6 +282,7 @@ public class HeifConverter internal constructor(
      * @property[outputFormat] Format of the saved image. See [withOutputFormat].
      * @property[outputFileName] The file name for the saved image. See [saveFileWithName].
      * @property[pathToSaveDirectory] The folder to save converted image to. See [saveToDirectory].
+     * @property[decoder] A custom decoder for converting a HEIC [Input] to a [Bitmap].
      */
     public data class Options constructor(
         val input: Input = None,
