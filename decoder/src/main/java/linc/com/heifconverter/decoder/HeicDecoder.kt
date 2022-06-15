@@ -10,17 +10,17 @@ import java.net.URL
 /**
  * Defines an object that can take the different HEIC input types and convert it to a [Bitmap].
  */
-internal interface Decoder {
+public interface HeicDecoder {
 
-    suspend fun fromByteArray(byteArray: ByteArray): Bitmap?
+    public suspend fun fromByteArray(byteArray: ByteArray): Bitmap?
 
-    suspend fun fromFile(file: File): Bitmap?
+    public suspend fun fromFile(file: File): Bitmap?
 
-    suspend fun fromInputStream(stream: InputStream): Bitmap?
+    public suspend fun fromInputStream(stream: InputStream): Bitmap?
 
-    suspend fun fromResources(@RawRes resId: Int): Bitmap?
+    public suspend fun fromResources(@RawRes resId: Int): Bitmap?
 
-    suspend fun fromUrl(url: String): Bitmap? = fromInputStream(downloadToStream(url))
+    public suspend fun fromUrl(url: String): Bitmap? = fromInputStream(downloadToStream(url))
 }
 
 private fun downloadToStream(urlString: String): InputStream {

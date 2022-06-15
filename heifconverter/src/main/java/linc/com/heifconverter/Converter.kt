@@ -13,9 +13,9 @@ import linc.com.heifconverter.HeifConverter.Format
 import linc.com.heifconverter.HeifConverter.Input
 import linc.com.heifconverter.HeifConverter.Key
 import linc.com.heifconverter.HeifConverter.Options
-import linc.com.heifconverter.decoder.Decoder
-import linc.com.heifconverter.decoder.ModernDecoder
-import linc.com.heifconverter.decoder.legacy.LegacyDecoder
+import linc.com.heifconverter.decoder.HeicDecoder
+import linc.com.heifconverter.decoder.ModernHeicDecoder
+import linc.com.heifconverter.decoder.legacy.LegacyHeicDecoder
 import java.io.File
 import java.io.FileOutputStream
 
@@ -66,19 +66,19 @@ internal class Converter constructor(
     }
 
     /**
-     * Create the [Bitmap] using a [Decoder] based on the Android OS level.
+     * Create the [Bitmap] using a [HeicDecoder] based on the Android OS level.
      */
     private suspend fun Input.createBitmap(context: Context): Bitmap? {
-        val decoder: Decoder =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ModernDecoder(context)
-            else LegacyDecoder(context)
+        val heicDecoder: HeicDecoder =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ModernHeicDecoder(context)
+            else LegacyHeicDecoder(context)
 
         return when (this) {
-            is Input.ByteArray -> decoder.fromByteArray(data)
-            is Input.File -> decoder.fromFile(data)
-            is Input.InputStream -> decoder.fromInputStream(data)
-            is Input.Resources -> decoder.fromResources(data)
-            is Input.Url -> decoder.fromUrl(data)
+            is Input.ByteArray -> heicDecoder.fromByteArray(data)
+            is Input.File -> heicDecoder.fromFile(data)
+            is Input.InputStream -> heicDecoder.fromInputStream(data)
+            is Input.Resources -> heicDecoder.fromResources(data)
+            is Input.Url -> heicDecoder.fromUrl(data)
             else -> throw IllegalStateException(
                 "You forget to pass input type: File, Url etc. Use such functions: fromFile() etc."
             )
