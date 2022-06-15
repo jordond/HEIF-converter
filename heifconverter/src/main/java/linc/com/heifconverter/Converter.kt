@@ -10,7 +10,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import linc.com.heifconverter.HeifConverter.Companion.create
 import linc.com.heifconverter.HeifConverter.Format
-import linc.com.heifconverter.HeifConverter.Input
 import linc.com.heifconverter.HeifConverter.Key
 import linc.com.heifconverter.HeifConverter.Options
 import linc.com.heifconverter.decoder.DefaultHeicDecoder
@@ -31,7 +30,8 @@ internal class Converter constructor(
      */
     suspend fun convert(): Map<String, Any?> {
         val bitmap = withContext(Dispatchers.IO) {
-            options.input.createBitmap(context, options)
+            val heicDecoder: HeicDecoder = options.decoder ?: DefaultHeicDecoder(context)
+            heicDecoder.decode(input = options.input)
         } ?: return createResultMap(null)
 
         // Return early if we don't need to save the bitmap
@@ -62,24 +62,6 @@ internal class Converter constructor(
     ): Job = coroutineScope.launch(Dispatchers.Main) {
         val result = convert()
         block(result)
-    }
-
-    /**
-     * Create the [Bitmap] using a [HeicDecoder] based on the Android OS level.
-     */
-    private suspend fun Input.createBitmap(context: Context, options: Options): Bitmap? {
-        val heicDecoder: HeicDecoder = options.decoder ?: DefaultHeicDecoder(context)
-
-        return when (this) {
-            is Input.ByteArray -> heicDecoder.fromByteArray(data)
-            is Input.File -> heicDecoder.fromFile(data)
-            is Input.InputStream -> heicDecoder.fromInputStream(data)
-            is Input.Resources -> heicDecoder.fromResources(data)
-            is Input.Url -> heicDecoder.fromUrl(data)
-            else -> throw IllegalStateException(
-                "You forget to pass input type: File, Url etc. Use such functions: fromFile() etc."
-            )
-        }
     }
 
     private fun createResultMap(bitmap: Bitmap?, path: String? = null) = mapOf(
