@@ -206,7 +206,7 @@ public class HeifConverter internal constructor(
      * @param[heicDecoder] A custom [HeicDecoder] implementation for decoding HEIC. If `null` then
      * the default decoder will be used.
      */
-    public fun setCustomDecoder(heicDecoder: HeicDecoder?): HeifConverter = apply {
+    public fun withCustomDecoder(heicDecoder: HeicDecoder?): HeifConverter = apply {
         updateOptions { copy(decoder = heicDecoder) }
     }
 

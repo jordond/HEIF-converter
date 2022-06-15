@@ -154,14 +154,14 @@ public interface HeifConverterDsl {
     /**
      * A custom decoder for converting a HEIC [Input] to a [Bitmap].
      *
-     * @see HeifConverter.setCustomDecoder
+     * @see HeifConverter.withCustomDecoder
      */
     public var customDecoder: HeicDecoder?
 
     /**
      * A custom decoder for converting a HEIC [Input] to a [Bitmap].
      *
-     * @see HeifConverter.setCustomDecoder
+     * @see HeifConverter.withCustomDecoder
      */
     public fun customDecoder(decoder: HeicDecoder?)
 }

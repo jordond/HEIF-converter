@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 if (useGlide.isChecked) {
-                    setCustomDecoder(GlideHeicDecoder(context = this@MainActivity))
+                    withCustomDecoder(GlideHeicDecoder(context = this@MainActivity))
                 }
             }
             .withOutputFormat(HeifConverter.Format.PNG)
