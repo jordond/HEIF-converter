@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import linc.com.heifconverter.HeifConverter.Companion.create
 import linc.com.heifconverter.HeifConverter.Input.None
+import linc.com.heifconverter.decoder.HeicDecoder
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.InputStream
@@ -279,6 +280,7 @@ public class HeifConverter internal constructor(
         val outputFormat: Format = Format.JPEG,
         val outputFileName: String = UUID.randomUUID().toString(),
         val pathToSaveDirectory: File? = null,
+        val decoder: HeicDecoder? = null,
     ) {
 
         internal val outputFileNameWithFormat = "${outputFileName}${outputFormat.extension}"

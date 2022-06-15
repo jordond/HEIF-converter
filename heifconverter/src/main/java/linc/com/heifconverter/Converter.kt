@@ -32,7 +32,7 @@ internal class Converter constructor(
      */
     suspend fun convert(): Map<String, Any?> {
         val bitmap = withContext(Dispatchers.IO) {
-            options.input.createBitmap(context)
+            options.input.createBitmap(context, options)
         } ?: return createResultMap(null)
 
         // Return early if we don't need to save the bitmap
@@ -68,9 +68,9 @@ internal class Converter constructor(
     /**
      * Create the [Bitmap] using a [HeicDecoder] based on the Android OS level.
      */
-    private suspend fun Input.createBitmap(context: Context): Bitmap? {
-        val heicDecoder: HeicDecoder =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ModernHeicDecoder(context)
+    private suspend fun Input.createBitmap(context: Context, options: Options): Bitmap? {
+        val heicDecoder: HeicDecoder = options.decoder
+            ?: if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ModernHeicDecoder(context)
             else LegacyHeicDecoder(context)
 
         return when (this) {

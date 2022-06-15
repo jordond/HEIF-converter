@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.scale
 import androidx.lifecycle.lifecycleScope
 import linc.com.heifconverter.HeifConverter
+import linc.com.heifconverter.decoder.glide.GlideDecoder
 import linc.com.heifconverter.dsl.HeifConverterResult
 import linc.com.heifconverter.dsl.extension.create
 
@@ -55,6 +56,7 @@ class MainActivity : AppCompatActivity() {
                 outputQuality(100)
                 outputName("Image_Converted_Name")
                 saveResultImage(true)
+                customDecoder(GlideDecoder(context = this@MainActivity))
             }
             .convert(lifecycleScope) { result ->
                 stop()
@@ -97,7 +99,7 @@ class MainActivity : AppCompatActivity() {
         val message = "Bitmap size: ${bytes}mb"
         Log.i("MainActivity", message)
 
-        if (bitmap.height > 2000 || bitmap.width > 2000 ) {
+        if (bitmap.height > 2000 || bitmap.width > 2000) {
             // If the source HEIC is 4K, the inflated Bitmap will be very large.
             val scaled = bitmap.scale(bitmap.width / 4, bitmap.height / 4)
             resultImage.setImageBitmap(scaled)

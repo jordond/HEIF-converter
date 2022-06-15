@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import androidx.annotation.IntRange
 import linc.com.heifconverter.HeifConverter
 import linc.com.heifconverter.HeifConverter.Format
+import linc.com.heifconverter.decoder.HeicDecoder
 import java.io.File
 
 /**
@@ -128,6 +129,8 @@ public interface HeifConverterDsl {
      * @see HeifConverter.Options.pathToSaveDirectory
      */
     public fun useDefaultOutputPath(context: Context)
+
+    public fun customDecoder(decoder: HeicDecoder)
 }
 
 internal class InternalHeifConverterDsl(
@@ -181,6 +184,10 @@ internal class InternalHeifConverterDsl(
     override fun useDefaultOutputPath(context: Context) {
         val path = HeifConverter.Options.defaultOutputPath(context)
         options = options.copy(pathToSaveDirectory = path)
+    }
+
+    override fun customDecoder(decoder: HeicDecoder) {
+        options = options.copy(decoder = decoder)
     }
 
     fun build(context: Context) = HeifConverter.create(context, options)
