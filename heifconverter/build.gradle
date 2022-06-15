@@ -33,7 +33,6 @@ android {
 dependencies {
     // local
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    api project(":decoder")
 
     // AndroidX
     implementation 'androidx.appcompat:appcompat:1.4.2'

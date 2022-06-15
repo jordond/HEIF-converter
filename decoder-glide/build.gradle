@@ -24,7 +24,7 @@ android {
 }
 
 dependencies {
-    api project(":decoder")
+    implementation project(":heifconverter")
 
     // Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
