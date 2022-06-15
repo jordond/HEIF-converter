@@ -61,6 +61,12 @@ HeifConverter.useContext(this)
     }
 ```
 
+### Note
+
+If your source HEIC file is large (for example 4K), then once it is converted into a `Bitmap` it
+could potentially be very very large. Large enough to cause a crash if you pass it directly to
+an `ImageView`.
+
 ### DSL + extension syntax
 
 **Note:** Make sure you include the `heifconverter-dsl` dependency!
