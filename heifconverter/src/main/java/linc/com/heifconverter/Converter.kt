@@ -14,6 +14,7 @@ import linc.com.heifconverter.HeifConverter.Key
 import linc.com.heifconverter.HeifConverter.Options
 import linc.com.heifconverter.decoder.DefaultHeicDecoder
 import linc.com.heifconverter.decoder.HeicDecoder
+import linc.com.heifconverter.decoder.decode
 import java.io.File
 import java.io.FileOutputStream
 
