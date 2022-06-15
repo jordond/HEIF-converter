@@ -57,8 +57,12 @@ public class HeifConverter internal constructor(
     /**
      * Use an [InputStream] for loading the HEIC file.
      *
+     * This method is deprecated because passing around [InputStream]s is inherently dangerous and
+     * prone to memory leaks. Instead use another one of the input methods.
+     *
      * @param[inputStream] [InputStream] for HEIC image.
      */
+    @Deprecated("It is dangerous to pass around a InputStream, use one of the other input sources.")
     public fun fromInputStream(inputStream: InputStream): HeifConverter = apply {
         updateOptions { copy(input = Input.InputStream(inputStream)) }
     }

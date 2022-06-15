@@ -90,6 +90,8 @@ public suspend fun HeifConverter.Companion.convert(
  * @see HeifConverter.convertBlocking for more info.
  * @see HeifConverterDsl for all available options.
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
+@Deprecated("It is dangerous to pass around a InputStream, use one of the other input sources.")
 public suspend fun HeifConverter.Companion.convert(
     context: Context,
     inputStream: InputStream,

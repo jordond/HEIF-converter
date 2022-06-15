@@ -92,6 +92,8 @@ public fun HeifConverter.Companion.create(
  * @return A [HeifConverterInstance] for converting the [inputStream].
  * @see HeifConverterDsl for all available options.
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
+@Deprecated("It is dangerous to pass around a InputStream, use one of the other input sources.")
 public fun HeifConverter.Companion.create(
     context: Context,
     inputStream: InputStream,
