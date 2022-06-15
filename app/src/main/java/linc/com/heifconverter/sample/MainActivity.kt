@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     private val optionResource by lazy { findViewById<RadioButton>(R.id.optionResource) }
     private val progress by lazy { findViewById<ProgressBar>(R.id.progress) }
     private val convert by lazy { findViewById<Button>(R.id.convert) }
+    private val useGlide by lazy { findViewById<CheckBox>(R.id.useGlide) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +57,9 @@ class MainActivity : AppCompatActivity() {
                 outputQuality(100)
                 outputName("Image_Converted_Name")
                 saveResultImage(true)
-                customDecoder(GlideHeicDecoder(context = this@MainActivity))
+                if (useGlide.isChecked) {
+                    customDecoder(GlideHeicDecoder(context = this@MainActivity))
+                }
             }
             .convert(lifecycleScope) { result ->
                 stop()
@@ -71,6 +74,10 @@ class MainActivity : AppCompatActivity() {
                     is HeifConverter.Input.Resources -> fromResource(source.data)
                     is HeifConverter.Input.Url -> fromUrl(source.data)
                     else -> throw IllegalStateException("Not supported")
+                }
+
+                if (useGlide.isChecked) {
+                    setCustomDecoder(GlideHeicDecoder(context = this@MainActivity))
                 }
             }
             .withOutputFormat(HeifConverter.Format.PNG)
