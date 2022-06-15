@@ -23,7 +23,6 @@ Converter for High Efficiency Image Format(HEIF) to other image format
 ``` groovy
 allprojects {
   repositories {
-    ...
     maven { url 'https://jitpack.io' }
   }
 }
@@ -201,6 +200,23 @@ To enable them you can do:
 
 ```kotlin
 val decoder = GlideHeicDecoder(context, useHardwareBitmaps = true)
+```
+
+## Customizing the conversion
+
+Look at `HeifConverter.Options` to see all the available options and their defaults. Both the
+builder and DSL-builder provide methods for changing all of the options.
+
+```kotlin
+data class Options constructor(
+    val input: Input = None,
+    val saveResultImage: Boolean = true, // Save the converting Bitmap to the disk
+    val outputQuality: Int = 100, // Quality of the saved image 0-100
+    val outputFormat: Format = Format.JPEG,
+    val outputFileName: String = UUID.randomUUID().toString(),
+    val pathToSaveDirectory: File? = null, // Directory to save the converted bitmap
+    val decoder: HeicDecoder? = null, // A custom implementation for decoding a HEIC file
+)
 ```
 
 ### convert function
