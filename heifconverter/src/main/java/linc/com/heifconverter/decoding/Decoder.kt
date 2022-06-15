@@ -1,7 +1,7 @@
 package linc.com.heifconverter.decoding
 
 import android.graphics.Bitmap
-import androidx.annotation.DrawableRes
+import androidx.annotation.RawRes
 import java.io.File
 import java.io.InputStream
 import java.net.HttpURLConnection
@@ -18,7 +18,7 @@ internal interface Decoder {
 
     suspend fun fromInputStream(stream: InputStream): Bitmap?
 
-    suspend fun fromResources(@DrawableRes resId: Int): Bitmap?
+    suspend fun fromResources(@RawRes resId: Int): Bitmap?
 
     suspend fun fromUrl(url: String): Bitmap? = fromInputStream(downloadToStream(url))
 }

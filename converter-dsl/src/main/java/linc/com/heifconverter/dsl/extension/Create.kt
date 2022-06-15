@@ -2,7 +2,7 @@ package linc.com.heifconverter.dsl.extension
 
 import android.content.Context
 import android.graphics.Bitmap
-import androidx.annotation.DrawableRes
+import androidx.annotation.RawRes
 import linc.com.heifconverter.HeifConverter
 import linc.com.heifconverter.HeifConverter.Input
 import linc.com.heifconverter.dsl.HeifConverterDsl
@@ -100,12 +100,12 @@ public fun HeifConverter.Companion.create(
 ): HeifConverterInstance = create(context, Input.InputStream(inputStream), options, block)
 
 /**
- * A DSL builder for creating a [HeifConverter] with a [DrawableRes] [Int] as the input.
+ * A DSL builder for creating a [HeifConverter] with a [RawRes] [Int] as the input.
  *
  * DSL example:
  *
  * ```
- * val converter = HeifConverter.create(context, R.drawable.my_heic_image) {
+ * val converter = HeifConverter.create(context, R.raw.my_heic_image) {
  *     saveResultImage = true
  *     outputFormat = HeifConverter.Format.JPEG
  * }
@@ -122,7 +122,7 @@ public fun HeifConverter.Companion.create(
  *     outputDirectory(context.cacheDir)
  * }
  *
- * val result = HeifConverter.create(context, R.drawable.heic_image, options).convert()
+ * val result = HeifConverter.create(context, R.raw.heic_image, options).convert()
  * ```
  *
  * @param[context] [Context] reference to initialize [HeifConverter].
@@ -134,7 +134,7 @@ public fun HeifConverter.Companion.create(
  */
 public fun HeifConverter.Companion.create(
     context: Context,
-    @DrawableRes resId: Int,
+    @RawRes resId: Int,
     options: HeifConverter.Options = HeifConverter.Options(),
     block: HeifConverterDsl.() -> Unit = {},
 ): HeifConverterInstance = create(context, Input.Resources(resId), options, block)

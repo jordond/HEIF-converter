@@ -3,8 +3,8 @@ package linc.com.heifconverter
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Environment
-import androidx.annotation.DrawableRes
 import androidx.annotation.IntRange
+import androidx.annotation.RawRes
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -65,10 +65,10 @@ public class HeifConverter internal constructor(
     /**
      * Load the HEIC input from the app's resources.
      *
-     * @param[resId] A [DrawableRes] ID for your HEIC image.
+     * @param[resId] A [RawRes] ID for your HEIC image.
      * @throws FileNotFoundException if the [resId] is not valid.
      */
-    public fun fromResource(@DrawableRes resId: Int): HeifConverter = apply {
+    public fun fromResource(@RawRes resId: Int): HeifConverter = apply {
         val isResValid = context.resources.getIdentifier(
             context.resources.getResourceName(resId),
             "drawable",
@@ -342,7 +342,7 @@ public class HeifConverter internal constructor(
     public sealed class Input {
         public class File(public val data: java.io.File) : Input()
         public class Url(public val data: String) : Input()
-        public class Resources(@DrawableRes public val data: Int) : Input()
+        public class Resources(@RawRes public val data: Int) : Input()
         public class InputStream(public val data: java.io.InputStream) : Input()
         public class ByteArray(public val data: kotlin.ByteArray) : Input()
         public object None : Input()
@@ -389,7 +389,7 @@ public class HeifConverter internal constructor(
          *  // ...
          * ```
          *
-         * Supported input types: [File], [ByteArray], drawable resource ID, remote URL,
+         * Supported input types: [File], [ByteArray], raw resource ID, remote URL,
          * absolute filepath, and [InputStream].
          *
          * To start the conversion process and get the [Bitmap] and/or the saved
