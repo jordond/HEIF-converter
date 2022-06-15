@@ -274,7 +274,7 @@ public class HeifConverter internal constructor(
             updateOptions { copy(pathToSaveDirectory = Options.defaultOutputPath(context)) }
         }
 
-        return Converter(context, options)
+        return DefaultConverter(context, options)
     }
 
     /**
@@ -363,6 +363,31 @@ public class HeifConverter internal constructor(
         public class InputStream(public val data: java.io.InputStream) : Input()
         public class ByteArray(public val data: kotlin.ByteArray) : Input()
         public object None : Input()
+    }
+
+    internal interface Converter {
+
+        /**
+         * Convert the HEIC image to a [Bitmap] synchronously.
+         *
+         * @return Result map containing the [Bitmap] and a path to the saved bitmap..
+         * @throws RuntimeException if no input file was provided, see [create].
+         */
+        suspend fun convert(): Map<String, Any?>
+
+        /**
+         * Convert the HEIC image to a [Bitmap] asynchronously.
+         *
+         * @see convert
+         * @param[coroutineScope] Custom [CoroutineScope] for launching the conversion coroutine.
+         * @param[block] Lambda for retrieving the results asynchronously.
+         * @return Result map containing the [Bitmap] and a path to the saved bitmap.
+         * @throws RuntimeException if no input file was provided, see [create].
+         */
+        fun convert(
+            coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main),
+            block: (result: Map<String, Any?>) -> Unit,
+        ): Job
     }
 
     public companion object {

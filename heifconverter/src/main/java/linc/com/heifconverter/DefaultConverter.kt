@@ -8,7 +8,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import linc.com.heifconverter.HeifConverter.Companion.create
 import linc.com.heifconverter.HeifConverter.Format
 import linc.com.heifconverter.HeifConverter.Key
 import linc.com.heifconverter.HeifConverter.Options
@@ -18,18 +17,15 @@ import linc.com.heifconverter.decoder.decode
 import java.io.File
 import java.io.FileOutputStream
 
-internal class Converter constructor(
+internal class DefaultConverter constructor(
     private val context: Context,
     private val options: Options,
-) {
+) : HeifConverter.Converter {
 
     /**
-     * Convert the HEIC image to a [Bitmap] synchronously.
-     *
-     * @return Result map containing the [Bitmap] and a path to the saved bitmap..
-     * @throws RuntimeException if no input file was provided, see [create].
+     * @see HeifConverter.Converter.convert
      */
-    suspend fun convert(): Map<String, Any?> {
+    override suspend fun convert(): Map<String, Any?> {
         val bitmap = withContext(Dispatchers.IO) {
             val heicDecoder: HeicDecoder = options.decoder ?: DefaultHeicDecoder(context)
             heicDecoder.decode(input = options.input)
@@ -49,16 +45,10 @@ internal class Converter constructor(
     }
 
     /**
-     * Convert the HEIC image to a [Bitmap] asynchronously.
-     *
-     * @see convert
-     * @param[coroutineScope] Custom [CoroutineScope] for launching the conversion coroutine.
-     * @param[block] Lambda for retrieving the results asynchronously.
-     * @return Result map containing the [Bitmap] and a path to the saved bitmap.
-     * @throws RuntimeException if no input file was provided, see [create].
+     * @see HeifConverter.Converter.convert
      */
-    fun convert(
-        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main),
+    override fun convert(
+        coroutineScope: CoroutineScope,
         block: (result: Map<String, Any?>) -> Unit,
     ): Job = coroutineScope.launch(Dispatchers.Main) {
         val result = convert()
