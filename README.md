@@ -31,7 +31,7 @@ allprojects {
 
 ``` groovy
 dependencies {
-  // Include main library + DSL extensions
+  // Include everything
   implementation 'com.github.lincollincol:HEIF-converter:v2.0'
   
   // Or you can add them indiviually
@@ -41,6 +41,9 @@ dependencies {
   
   // Optional DSL + extension library
   implementation 'com.github.lincollincol:HEIF-converter:heifconverter-dsl:v2.0'
+  
+  // Optional Decoder using Glide (see below about Android <= 9)
+  implementation 'com.github.lincollincol:HEIF-converter:decoder-glide:v2.0'
 }
 ```
 
@@ -66,6 +69,15 @@ HeifConverter.useContext(this)
 If your source HEIC file is large (for example 4K), then once it is converted into a `Bitmap` it
 could potentially be very very large. Large enough to cause a crash if you pass it directly to
 an `ImageView`.
+
+## Android 9 and lower
+
+If you are using this and need to support Android API 28 (9 Pie) or lower. Then there is a good
+chance the converter will crash because the current implementation of the `HeifReader` class does
+not support all types of HEIF files.
+
+To fix this you can use a custom `HeifConverter.HeicDecoder` instance. You can create one yourself,
+but one is provided in the `:decoder-glide` module.
 
 ### DSL + extension syntax
 
@@ -133,6 +145,62 @@ class SampleClass(context: Context) {
         return result.bitmap
     }
 }
+```
+
+## Glide decoder
+
+To use the Glide decoder first you must include the dependency:
+
+```groovy
+implementation 'com.github.lincollincol:HEIF-converter:decoder-glide:v2.0'
+
+// Optional for using DSL syntax
+implementation 'com.github.lincollincol:HEIF-converter:heifconverter-dsl:v2.0'
+```
+
+Then set the custom decoder when using `HeifConverter`:
+
+```kotlin
+val file: File = File("sample.heic")
+HeifConverter.create(contex)
+    .fromFile(file)
+    .customDecoder(GlideHeicDecoder(context))
+    .setCustomDecoder { result ->
+        // handle result
+    }
+```
+
+Here is an example using the DSL:
+
+```kotlin
+val (bitmap, imagePath) = HeifConverter.convert(context, file) {
+    customDecoder(GlideHeicDecoder(context))
+}
+```
+
+If you only want to use the Glide decoder on Android 9 and lower:
+
+```kotlin
+val decoder: HeifConverter.HeicDecoder? =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) null
+    else GildeHeicDecoder(context)
+
+val (bitmap, imagePath) = HeifConverter.convert(context, file) {
+    customDecoder = decoder
+}
+```
+
+### Glide and Hardware Bitmaps
+
+Glide has a concept
+called [Hardware Bitmaps](https://bumptech.github.io/glide/doc/hardwarebitmaps.html). They have the
+potential to save memory and be quicker. However support is only on Android 9 and above, so keep
+that in mind.
+
+To enable them you can do:
+
+```kotlin
+val decoder = GlideHeicDecoder(context, useHardwareBitmaps = true)
 ```
 
 ### convert function

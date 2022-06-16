@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import linc.com.heifconverter.HeifConverter.Companion.create
 import linc.com.heifconverter.HeifConverter.Input.None
+import linc.com.heifconverter.decoder.HeicDecoder
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.InputStream
@@ -56,8 +57,12 @@ public class HeifConverter internal constructor(
     /**
      * Use an [InputStream] for loading the HEIC file.
      *
+     * This method is deprecated because passing around [InputStream]s is inherently dangerous and
+     * prone to memory leaks. Instead use another one of the input methods.
+     *
      * @param[inputStream] [InputStream] for HEIC image.
      */
+    @Deprecated("It is dangerous to pass around a InputStream, use one of the other input sources.")
     public fun fromInputStream(inputStream: InputStream): HeifConverter = apply {
         updateOptions { copy(input = Input.InputStream(inputStream)) }
     }
@@ -196,6 +201,16 @@ public class HeifConverter internal constructor(
         saveToDirectory(File(pathToDirectory))
 
     /**
+     * Set a custom [HeicDecoder] for decoding the HEIC [Input] to a [Bitmap].
+     *
+     * @param[heicDecoder] A custom [HeicDecoder] implementation for decoding HEIC. If `null` then
+     * the default decoder will be used.
+     */
+    public fun withCustomDecoder(heicDecoder: HeicDecoder?): HeifConverter = apply {
+        updateOptions { copy(decoder = heicDecoder) }
+    }
+
+    /**
      * Convert the HEIC input into a [Bitmap].
      *
      * There is no way of tracking the saved file or accessing the generated [Bitmap]. For that
@@ -259,7 +274,7 @@ public class HeifConverter internal constructor(
             updateOptions { copy(pathToSaveDirectory = Options.defaultOutputPath(context)) }
         }
 
-        return Converter(context, options)
+        return DefaultConverter(context, options)
     }
 
     /**
@@ -271,6 +286,7 @@ public class HeifConverter internal constructor(
      * @property[outputFormat] Format of the saved image. See [withOutputFormat].
      * @property[outputFileName] The file name for the saved image. See [saveFileWithName].
      * @property[pathToSaveDirectory] The folder to save converted image to. See [saveToDirectory].
+     * @property[decoder] A custom decoder for converting a HEIC [Input] to a [Bitmap].
      */
     public data class Options constructor(
         val input: Input = None,
@@ -279,6 +295,7 @@ public class HeifConverter internal constructor(
         val outputFormat: Format = Format.JPEG,
         val outputFileName: String = UUID.randomUUID().toString(),
         val pathToSaveDirectory: File? = null,
+        val decoder: HeicDecoder? = null,
     ) {
 
         internal val outputFileNameWithFormat = "${outputFileName}${outputFormat.extension}"
@@ -346,6 +363,31 @@ public class HeifConverter internal constructor(
         public class InputStream(public val data: java.io.InputStream) : Input()
         public class ByteArray(public val data: kotlin.ByteArray) : Input()
         public object None : Input()
+    }
+
+    internal interface Converter {
+
+        /**
+         * Convert the HEIC image to a [Bitmap] synchronously.
+         *
+         * @return Result map containing the [Bitmap] and a path to the saved bitmap..
+         * @throws RuntimeException if no input file was provided, see [create].
+         */
+        suspend fun convert(): Map<String, Any?>
+
+        /**
+         * Convert the HEIC image to a [Bitmap] asynchronously.
+         *
+         * @see convert
+         * @param[coroutineScope] Custom [CoroutineScope] for launching the conversion coroutine.
+         * @param[block] Lambda for retrieving the results asynchronously.
+         * @return Result map containing the [Bitmap] and a path to the saved bitmap.
+         * @throws RuntimeException if no input file was provided, see [create].
+         */
+        fun convert(
+            coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main),
+            block: (result: Map<String, Any?>) -> Unit,
+        ): Job
     }
 
     public companion object {

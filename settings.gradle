@@ -1,4 +1,5 @@
 rootProject.name='HEIFConverter'
 include ':app'
 include ':heifconverter'
+include ':decoder-glide'
 include ':converter-dsl'

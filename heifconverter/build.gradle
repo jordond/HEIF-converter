@@ -31,7 +31,6 @@ android {
 }
 
 dependencies {
-
     // local
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 

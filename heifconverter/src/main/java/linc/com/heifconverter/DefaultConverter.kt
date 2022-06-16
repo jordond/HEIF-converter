@@ -8,31 +8,27 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import linc.com.heifconverter.HeifConverter.Companion.create
 import linc.com.heifconverter.HeifConverter.Format
-import linc.com.heifconverter.HeifConverter.Input
 import linc.com.heifconverter.HeifConverter.Key
 import linc.com.heifconverter.HeifConverter.Options
-import linc.com.heifconverter.decoding.Decoder
-import linc.com.heifconverter.decoding.ModernDecoder
-import linc.com.heifconverter.decoding.legacy.LegacyDecoder
+import linc.com.heifconverter.decoder.DefaultHeicDecoder
+import linc.com.heifconverter.decoder.HeicDecoder
+import linc.com.heifconverter.decoder.decode
 import java.io.File
 import java.io.FileOutputStream
 
-internal class Converter constructor(
+internal class DefaultConverter constructor(
     private val context: Context,
     private val options: Options,
-) {
+) : HeifConverter.Converter {
 
     /**
-     * Convert the HEIC image to a [Bitmap] synchronously.
-     *
-     * @return Result map containing the [Bitmap] and a path to the saved bitmap..
-     * @throws RuntimeException if no input file was provided, see [create].
+     * @see HeifConverter.Converter.convert
      */
-    suspend fun convert(): Map<String, Any?> {
+    override suspend fun convert(): Map<String, Any?> {
         val bitmap = withContext(Dispatchers.IO) {
-            options.input.createBitmap(context)
+            val heicDecoder: HeicDecoder = options.decoder ?: DefaultHeicDecoder(context)
+            heicDecoder.decode(input = options.input)
         } ?: return createResultMap(null)
 
         // Return early if we don't need to save the bitmap
@@ -49,40 +45,14 @@ internal class Converter constructor(
     }
 
     /**
-     * Convert the HEIC image to a [Bitmap] asynchronously.
-     *
-     * @see convert
-     * @param[coroutineScope] Custom [CoroutineScope] for launching the conversion coroutine.
-     * @param[block] Lambda for retrieving the results asynchronously.
-     * @return Result map containing the [Bitmap] and a path to the saved bitmap.
-     * @throws RuntimeException if no input file was provided, see [create].
+     * @see HeifConverter.Converter.convert
      */
-    fun convert(
-        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main),
+    override fun convert(
+        coroutineScope: CoroutineScope,
         block: (result: Map<String, Any?>) -> Unit,
     ): Job = coroutineScope.launch(Dispatchers.Main) {
         val result = convert()
         block(result)
-    }
-
-    /**
-     * Create the [Bitmap] using a [Decoder] based on the Android OS level.
-     */
-    private suspend fun Input.createBitmap(context: Context): Bitmap? {
-        val decoder: Decoder =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ModernDecoder(context)
-            else LegacyDecoder(context)
-
-        return when (this) {
-            is Input.ByteArray -> decoder.fromByteArray(data)
-            is Input.File -> decoder.fromFile(data)
-            is Input.InputStream -> decoder.fromInputStream(data)
-            is Input.Resources -> decoder.fromResources(data)
-            is Input.Url -> decoder.fromUrl(data)
-            else -> throw IllegalStateException(
-                "You forget to pass input type: File, Url etc. Use such functions: fromFile() etc."
-            )
-        }
     }
 
     private fun createResultMap(bitmap: Bitmap?, path: String? = null) = mapOf(

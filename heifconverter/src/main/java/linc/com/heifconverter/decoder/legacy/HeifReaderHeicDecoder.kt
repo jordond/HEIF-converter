@@ -1,14 +1,14 @@
-package linc.com.heifconverter.decoding.legacy
+package linc.com.heifconverter.decoder.legacy
 
 import android.content.Context
-import linc.com.heifconverter.decoding.Decoder
+import linc.com.heifconverter.decoder.HeicDecoder
 import java.io.File
 import java.io.InputStream
 
 /**
- * A [Decoder] for Android P and below, using the [HeifReader] to convert the files.
+ * A [HeicDecoder] for Android P and below, using the [HeifReader] to convert the files.
  */
-internal class LegacyDecoder(private val context: Context) : Decoder {
+internal class HeifReaderHeicDecoder(private val context: Context) : HeicDecoder {
 
     private val reader: HeifReader
         get() = HeifReader(context)

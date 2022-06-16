@@ -1,4 +1,4 @@
-package linc.com.heifconverter.decoding
+package linc.com.heifconverter.decoder
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -9,10 +9,10 @@ import java.io.File
 import java.io.InputStream
 
 /**
- * [Decoder] class for Android Q and higher.
+ * [HeicDecoder] class for Android Q and higher.
  */
 @RequiresApi(Build.VERSION_CODES.Q)
-internal class ModernDecoder(private val context: Context) : Decoder {
+internal class BitmapFactoryHeicDecoder(private val context: Context) : HeicDecoder {
 
     override suspend fun fromByteArray(byteArray: ByteArray): Bitmap? {
         val bitmapOptions = BitmapFactory.Options().apply {

@@ -1,4 +1,4 @@
-package linc.com.heifconverter.decoding.legacy.iso14496.part12
+package linc.com.heifconverter.decoder.legacy.iso14496.part12
 
 import org.mp4parser.BoxParser
 import org.mp4parser.support.AbstractContainerBox

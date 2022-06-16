@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.scale
 import androidx.lifecycle.lifecycleScope
 import linc.com.heifconverter.HeifConverter
+import linc.com.heifconverter.decoder.glide.GlideHeicDecoder
 import linc.com.heifconverter.dsl.HeifConverterResult
 import linc.com.heifconverter.dsl.extension.create
 
@@ -21,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     private val optionResource by lazy { findViewById<RadioButton>(R.id.optionResource) }
     private val progress by lazy { findViewById<ProgressBar>(R.id.progress) }
     private val convert by lazy { findViewById<Button>(R.id.convert) }
+    private val useGlide by lazy { findViewById<CheckBox>(R.id.useGlide) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +57,9 @@ class MainActivity : AppCompatActivity() {
                 outputQuality(100)
                 outputName("Image_Converted_Name")
                 saveResultImage(true)
+                if (useGlide.isChecked) {
+                    customDecoder(GlideHeicDecoder(context = this@MainActivity))
+                }
             }
             .convert(lifecycleScope) { result ->
                 stop()
@@ -69,6 +74,10 @@ class MainActivity : AppCompatActivity() {
                     is HeifConverter.Input.Resources -> fromResource(source.data)
                     is HeifConverter.Input.Url -> fromUrl(source.data)
                     else -> throw IllegalStateException("Not supported")
+                }
+
+                if (useGlide.isChecked) {
+                    withCustomDecoder(GlideHeicDecoder(context = this@MainActivity))
                 }
             }
             .withOutputFormat(HeifConverter.Format.PNG)
@@ -97,7 +106,7 @@ class MainActivity : AppCompatActivity() {
         val message = "Bitmap size: ${bytes}mb"
         Log.i("MainActivity", message)
 
-        if (bitmap.height > 2000 || bitmap.width > 2000 ) {
+        if (bitmap.height > 2000 || bitmap.width > 2000) {
             // If the source HEIC is 4K, the inflated Bitmap will be very large.
             val scaled = bitmap.scale(bitmap.width / 4, bitmap.height / 4)
             resultImage.setImageBitmap(scaled)
