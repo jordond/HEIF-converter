@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.scale
 import androidx.lifecycle.lifecycleScope
 import linc.com.heifconverter.HeifConverter
-import linc.com.heifconverter.decoder.OkHttpImageLoader
+import linc.com.heifconverter.decoder.OkHttpUrlLoader
 import linc.com.heifconverter.decoder.glide.GlideHeicDecoder
 import linc.com.heifconverter.dsl.HeifConverterResult
 import linc.com.heifconverter.dsl.extension.create
@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         )
         .build()
 
-    private val okhttpImageLoader = OkHttpImageLoader(okHttpClient) {
+    private val OkHttpUrlLoader = OkHttpUrlLoader(okHttpClient) {
         header("Foo", "Bar")
     }
 
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
                     customDecoder(GlideHeicDecoder(context = this@MainActivity))
                 }
                 if (useOkHttp.isChecked) {
-                    imageLoader(okhttpImageLoader)
+                    urlLoader(OkHttpUrlLoader)
                 }
             }
             .convert(lifecycleScope) { result ->
@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 if (useOkHttp.isChecked) {
-                    withImageLoader(okhttpImageLoader)
+                    withUrlLoader(OkHttpUrlLoader)
                 }
             }
             .withOutputFormat(HeifConverter.Format.PNG)

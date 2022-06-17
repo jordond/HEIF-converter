@@ -41,9 +41,9 @@ public interface HeicDecoder {
      */
     public suspend fun fromUrl(
         url: String,
-        imageLoader: ImageLoader? = null,
+        urlLoader: UrlLoader? = null,
     ): Bitmap? {
-        val loader = imageLoader ?: ImageLoader.Default()
+        val loader = urlLoader ?: UrlLoader.Default()
         return fromInputStream(loader.download(url))
     }
 
@@ -51,11 +51,11 @@ public interface HeicDecoder {
      * A class for implementing how to download a URL [String] to a [InputStream] that can be
      * passed to [HeicDecoder.fromInputStream].
      *
-     * A default implementation is provided via [ImageLoader.Default]. Which you can override the
+     * A default implementation is provided via [UrlLoader.Default]. Which you can override the
      * behaviour of by creating a subclass:
      *
      */
-    public abstract class ImageLoader {
+    public abstract class UrlLoader {
 
         /**
          * Open a remote connection to the [url] and return a [InputStream]
@@ -65,12 +65,12 @@ public interface HeicDecoder {
         public abstract suspend fun download(url: String): InputStream
 
         /**
-         * A default implementation of [ImageLoader].
+         * A default implementation of [UrlLoader].
          *
          * You can override [Default.download] to perform logging or analytics:
          *
          * ```
-         * class LoggingImageLoader : DefaultImageLoader {
+         * class LoggingImageLoader : UrlLoader.Default() {
          *
          *     override suspend fun download(url: String): InputStream {
          *         Log.i("Downloading: $url")
@@ -82,7 +82,7 @@ public interface HeicDecoder {
          * Or you can customise the [HttpURLConnection] object like so:
          *
          * ```
-         * class AuthenticatedImageLoader(private val auth: AuthRepo) : DefaultImageLoader {
+         * class AuthenticatedImageLoader(private val auth: AuthRepo) : UrlLoader.Default() {
          *
          *     override fun customizeConnection(connection: HttpUrlConnection) {
          *         val authToken = auth.getAuthToken()
@@ -91,7 +91,7 @@ public interface HeicDecoder {
          * }
          * ```
          */
-        public open class Default : ImageLoader() {
+        public open class Default : UrlLoader() {
 
             /**
              * Customize the [HttpURLConnection] before the connection is opened.
@@ -124,18 +124,18 @@ public interface HeicDecoder {
  * Decode the [input] HEIC into a [Bitmap].
  *
  * @param[input] The HEIC [HeifConverter.Input] source to decode.
- * @param[imageLoader] Optional [HeicDecoder.ImageLoader] for downloading [HeifConverter.Input.Url].
+ * @param[urlLoader] Optional [HeicDecoder.UrlLoader] for downloading [HeifConverter.Input.Url].
  * @return The decoded [Bitmap] or `null`.
  */
 internal suspend fun HeicDecoder.decode(
     input: HeifConverter.Input,
-    imageLoader: HeicDecoder.ImageLoader? = null,
+    urlLoader: HeicDecoder.UrlLoader? = null,
 ): Bitmap? = when (input) {
     is HeifConverter.Input.ByteArray -> fromByteArray(input.data)
     is HeifConverter.Input.File -> fromFile(input.data)
     is HeifConverter.Input.InputStream -> fromInputStream(input.data)
     is HeifConverter.Input.Resources -> fromResources(input.data)
-    is HeifConverter.Input.Url -> fromUrl(input.data, imageLoader)
+    is HeifConverter.Input.Url -> fromUrl(input.data, urlLoader)
     else -> throw IllegalStateException(
         "You forget to pass input type: File, Url etc. Use such functions: fromFile() etc."
     )

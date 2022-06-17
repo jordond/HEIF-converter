@@ -43,6 +43,9 @@ dependencies {
   
   // Optional Decoder using Glide (see below about Android <= 9)
   implementation 'com.github.lincollincol:HEIF-converter:decoder-glide:v2.0'
+  
+  // Optional OkHttp3 HeidDecoder.ImageLoader for loading URLs
+  implementation 'com.github.lincollincol:HEIF-converter:imageloader-okhttp3:v2.0'
 }
 ```
 
@@ -78,7 +81,25 @@ not support all types of HEIF files.
 To fix this you can use a custom `HeifConverter.HeicDecoder` instance. You can create one yourself,
 but one is provided in the `:decoder-glide` module.
 
-### DSL + extension syntax
+## Customizing the conversion
+
+Look at `HeifConverter.Options` to see all the available options and their defaults. Both the
+builder and DSL-builder provide methods for changing all of the options.
+
+```kotlin
+data class Options constructor(
+    val input: Input = None,
+    val saveResultImage: Boolean = true, // Save the converting Bitmap to the disk
+    val outputQuality: Int = 100, // Quality of the saved image 0-100
+    val outputFormat: Format = Format.JPEG,
+    val outputFileName: String = UUID.randomUUID().toString(),
+    val pathToSaveDirectory: File? = null, // Directory to save the converted bitmap
+    val decoder: HeicDecoder? = null, // A custom implementation for decoding a HEIC file
+    val urlLoader: HeicDecoder.UrlLoader? = null, // A custom url loader for downloading Input.URL
+)
+```
+
+## DSL + extension syntax
 
 **Note:** Make sure you include the `heifconverter-dsl` dependency!
 
@@ -146,7 +167,9 @@ class SampleClass(context: Context) {
 }
 ```
 
-## Glide decoder
+## Custom Decoder
+
+### Glide decoder
 
 To use the Glide decoder first you must include the dependency:
 
@@ -202,22 +225,13 @@ To enable them you can do:
 val decoder = GlideHeicDecoder(context, useHardwareBitmaps = true)
 ```
 
-## Customizing the conversion
+## Custom URL loader
 
-Look at `HeifConverter.Options` to see all the available options and their defaults. Both the
-builder and DSL-builder provide methods for changing all of the options.
+TODO
 
-```kotlin
-data class Options constructor(
-    val input: Input = None,
-    val saveResultImage: Boolean = true, // Save the converting Bitmap to the disk
-    val outputQuality: Int = 100, // Quality of the saved image 0-100
-    val outputFormat: Format = Format.JPEG,
-    val outputFileName: String = UUID.randomUUID().toString(),
-    val pathToSaveDirectory: File? = null, // Directory to save the converted bitmap
-    val decoder: HeicDecoder? = null, // A custom implementation for decoding a HEIC file
-)
-```
+### OkHttp3 URL loader
+
+TODO
 
 ### convert function
 

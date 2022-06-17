@@ -14,14 +14,14 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 /**
- * An implementation of [HeicDecoder.ImageLoader] that uses [OkHttpClient] to make the request.
+ * An implementation of [HeicDecoder.UrlLoader] that uses [OkHttpClient] to make the request.
  *
- * You can use it with [HeifConverter.withImageLoader]:
+ * You can use it with [HeifConverter.withUrlLoader]:
  *
  * ```
  * HeifConverter.useContext(this)
  *     .fromUrl("https://github.com/nokiatech/heif/raw/gh-pages/content/images/crowd_1440x960.heic")
- *     .withImageLoader(OkHttpImageLoader())
+ *     .withImageLoader(OkHttpUrlLoader())
  *     .convert { }
  * ```
  *
@@ -30,7 +30,7 @@ import kotlin.coroutines.resumeWithException
  *
  * ```
  * val token = "" // An auth token
- * val imageLoader = OkHttpImageLoader() {
+ * val imageLoader = OkHttpUrlLoader() {
  *     header("Authorization", "Bearer $token")
  * }
  *
@@ -46,21 +46,21 @@ import kotlin.coroutines.resumeWithException
  * val inputUrl = "https://github.com/nokiatech/heif/raw/gh-pages/content/images/crowd_1440x960.heic"
  * val result = HeifConverter.convert(context, inputUrl) {
  *     // Property access
- *     imageLoader = OkHttpImageLoader()
+ *     imageLoader = OkHttpUrlLoader()
  *
  *     // Function setter
- *     imageLoader(OkHttpImageLoader())
+ *     imageLoader(OkHttpUrlLoader())
  * }
  * ```
  *
  * @param[client] Instance of [OkHttpClient] for making the request.
  * @param[customizeRequest] Lambda for customizing the [Request.Builder] before the request is executed.
- * @constructor Default implementation of a [HeicDecoder.ImageLoader] that uses [OkHttpClient].
+ * @constructor Default implementation of a [HeicDecoder.UrlLoader] that uses [OkHttpClient].
  */
-public open class OkHttpImageLoader(
+public open class OkHttpUrlLoader(
     private val client: OkHttpClient = OkHttpClient(),
     private val customizeRequest: Request.Builder.() -> Request.Builder,
-) : HeicDecoder.ImageLoader() {
+) : HeicDecoder.UrlLoader() {
 
     /**
      * Download the [url] to an [InputStream].

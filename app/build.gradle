@@ -33,7 +33,7 @@ dependencies {
     implementation project(":heifconverter")
     implementation project(':heifconverter-dsl')
     implementation project(":decoder-glide")
-    implementation project(":imageloader-okhttp3")
+    implementation project(':urlloader-okhttp3')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

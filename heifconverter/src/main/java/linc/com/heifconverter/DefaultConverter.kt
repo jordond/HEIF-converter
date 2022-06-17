@@ -28,7 +28,7 @@ internal class DefaultConverter constructor(
     override suspend fun convert(): Map<String, Any?> {
         val bitmap = withContext(Dispatchers.IO) {
             val heicDecoder: HeicDecoder = options.decoder ?: DefaultHeicDecoder(context)
-            heicDecoder.decode(input = options.input, imageLoader = options.imageLoader)
+            heicDecoder.decode(input = options.input, urlLoader = options.urlLoader)
         } ?: return createResultMap(null)
 
         // Return early if we don't need to save the bitmap

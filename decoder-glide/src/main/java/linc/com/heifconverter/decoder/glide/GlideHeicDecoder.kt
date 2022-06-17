@@ -85,14 +85,14 @@ public class GlideHeicDecoder(private val context: Context) : HeicDecoder {
     override suspend fun fromResources(resId: Int): Bitmap? = glideBuilder.load(resId).decode()
 
     /**
-     * Custom implementation of [HeicDecoder.fromUrl], if [imageLoader] is `null` then use [Glide]
+     * Custom implementation of [HeicDecoder.fromUrl], if [urlLoader] is `null` then use [Glide]
      * to download the [url] and pass it to [fromInputStream].
      *
      * @see HeicDecoder.fromUrl
      */
-    override suspend fun fromUrl(url: String, imageLoader: HeicDecoder.ImageLoader?): Bitmap? {
-        return if (imageLoader == null) glideBuilder.load(url).decode()
-        else fromInputStream(imageLoader.download(url))
+    override suspend fun fromUrl(url: String, urlLoader: HeicDecoder.UrlLoader?): Bitmap? {
+        return if (urlLoader == null) glideBuilder.load(url).decode()
+        else fromInputStream(urlLoader.download(url))
     }
 }
 

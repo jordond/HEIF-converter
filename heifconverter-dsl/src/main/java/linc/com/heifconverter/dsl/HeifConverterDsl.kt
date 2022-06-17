@@ -166,18 +166,18 @@ public interface HeifConverterDsl {
     public fun customDecoder(decoder: HeicDecoder?)
 
     /**
-     * A custom [HeicDecoder.ImageLoader] for downloading the URL from [HeifConverter.fromUrl].
+     * A custom [HeicDecoder.UrlLoader] for downloading the URL from [HeifConverter.fromUrl].
      *
-     * @see HeifConverter.withImageLoader
+     * @see HeifConverter.withUrlLoader
      */
-    public var imageLoader: HeicDecoder.ImageLoader?
+    public var urlLoader: HeicDecoder.UrlLoader?
 
     /**
-     * A custom [HeicDecoder.ImageLoader] for downloading the URL for [Input.Url].
+     * A custom [HeicDecoder.UrlLoader] for downloading the URL for [Input.Url].
      *
-     * @see HeifConverter.withImageLoader
+     * @see HeifConverter.withUrlLoader
      */
-    public fun imageLoader(imageLoader: HeicDecoder.ImageLoader?)
+    public fun urlLoader(urlLoader: HeicDecoder.UrlLoader?)
 }
 
 /**
@@ -249,14 +249,14 @@ internal class InternalHeifConverterDsl(
         this.customDecoder = decoder
     }
 
-    override var imageLoader: HeicDecoder.ImageLoader?
-        get() = options.imageLoader
+    override var urlLoader: HeicDecoder.UrlLoader?
+        get() = options.urlLoader
         set(value) {
-            options = options.copy(imageLoader = value)
+            options = options.copy(urlLoader = value)
         }
 
-    override fun imageLoader(imageLoader: HeicDecoder.ImageLoader?) {
-        this.imageLoader = imageLoader
+    override fun urlLoader(urlLoader: HeicDecoder.UrlLoader?) {
+        this.urlLoader = urlLoader
     }
 
     fun build(context: Context) = HeifConverter.create(context, options)
