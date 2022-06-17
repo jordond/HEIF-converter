@@ -1,6 +1,7 @@
 package linc.com.heifconverter.decoder
 
 import android.graphics.Bitmap
+import androidx.annotation.CallSuper
 import androidx.annotation.RawRes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -103,6 +104,7 @@ public interface HeicDecoder {
             public open fun customizeConnection(connection: HttpURLConnection) {}
 
             @Suppress("BlockingMethodInNonBlockingContext")
+            @CallSuper
             override suspend fun download(url: String): InputStream {
                 return withContext(Dispatchers.IO) {
                     (URL(url).openConnection() as HttpURLConnection).run {
