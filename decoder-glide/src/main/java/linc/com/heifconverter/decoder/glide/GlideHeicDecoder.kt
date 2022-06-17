@@ -29,7 +29,7 @@ import kotlin.coroutines.resumeWithException
  * @param[context] [Context] option used to initialize [Glide].
  * @constructor A [HeicDecoder] that uses [Glide] to decode the HEIC.
  */
-public class GlideHeicDecoder(context: Context) : HeicDecoder {
+public class GlideHeicDecoder(private val context: Context) : HeicDecoder {
 
     /**
      * A [HeicDecoder] that will work on all supported Android versions.
@@ -52,25 +52,47 @@ public class GlideHeicDecoder(context: Context) : HeicDecoder {
         .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
         .set(Downsampler.ALLOW_HARDWARE_CONFIG, useHardwareBitmaps)
 
+    /**
+     * @see HeicDecoder.fromByteArray
+     */
     override suspend fun fromByteArray(byteArray: ByteArray): Bitmap? {
         return glideBuilder.load(byteArray).decode()
     }
 
-    override suspend fun fromFile(file: File): Bitmap? {
-        return glideBuilder.load(file).decode()
+    /**
+     * @see HeicDecoder.fromFile
+     */
+    override suspend fun fromFile(file: File): Bitmap? = glideBuilder.load(file).decode()
+
+    /**
+     * @see HeicDecoder.fromInputStream
+     */
+    override suspend fun fromInputStream(
+        stream: InputStream,
+    ): Bitmap? = withContext(Dispatchers.IO) {
+        @Suppress("BlockingMethodInNonBlockingContext")
+        val tempFile = File.createTempFile("glide_heic_download", ".heic", context.cacheDir)
+        tempFile.outputStream().use { outputStream ->
+            stream.copyTo(outputStream)
+        }
+
+        fromFile(tempFile)
     }
 
-    override suspend fun fromInputStream(stream: InputStream): Bitmap? {
-        val byteArray = withContext(Dispatchers.IO) { stream.readBytes() }
-        return fromByteArray(byteArray)
-    }
+    /**
+     * @see HeicDecoder.fromResources
+     */
+    override suspend fun fromResources(resId: Int): Bitmap? = glideBuilder.load(resId).decode()
 
-    override suspend fun fromResources(resId: Int): Bitmap? {
-        return glideBuilder.load(resId).decode()
-    }
-
-    override suspend fun fromUrl(url: String): Bitmap? {
-        return glideBuilder.load(url).decode()
+    /**
+     * Custom implementation of [HeicDecoder.fromUrl], if [imageLoader] is `null` then use [Glide]
+     * to download the [url] and pass it to [fromInputStream].
+     *
+     * @see HeicDecoder.fromUrl
+     */
+    override suspend fun fromUrl(url: String, imageLoader: HeicDecoder.ImageLoader?): Bitmap? {
+        return if (imageLoader == null) glideBuilder.load(url).decode()
+        else fromInputStream(imageLoader.download(url))
     }
 }
 

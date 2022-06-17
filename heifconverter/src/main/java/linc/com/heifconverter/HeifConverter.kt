@@ -211,6 +211,17 @@ public class HeifConverter internal constructor(
     }
 
     /**
+     * A custom [HeicDecoder.ImageLoader] for downloading the URL from [HeifConverter.fromUrl].
+     *
+     * If set to `null` then a default implementation will be used.
+     *
+     * @param[imageLoader] A custom [HeicDecoder.ImageLoader] for downloading the [Input.Url].
+     */
+    public fun withImageLoader(imageLoader: HeicDecoder.ImageLoader?): HeifConverter = apply {
+        updateOptions { copy(imageLoader = imageLoader) }
+    }
+
+    /**
      * Convert the HEIC input into a [Bitmap].
      *
      * There is no way of tracking the saved file or accessing the generated [Bitmap]. For that
@@ -287,6 +298,7 @@ public class HeifConverter internal constructor(
      * @property[outputFileName] The file name for the saved image. See [saveFileWithName].
      * @property[pathToSaveDirectory] The folder to save converted image to. See [saveToDirectory].
      * @property[decoder] A custom decoder for converting a HEIC [Input] to a [Bitmap].
+     * @property[imageLoader] A custom image loader for downloading the [Input.Url].
      */
     public data class Options constructor(
         val input: Input = None,
@@ -296,6 +308,7 @@ public class HeifConverter internal constructor(
         val outputFileName: String = UUID.randomUUID().toString(),
         val pathToSaveDirectory: File? = null,
         val decoder: HeicDecoder? = null,
+        val imageLoader: HeicDecoder.ImageLoader? = null,
     ) {
 
         internal val outputFileNameWithFormat = "${outputFileName}${outputFormat.extension}"
