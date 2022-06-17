@@ -19,7 +19,7 @@ import kotlin.coroutines.resumeWithException
  * You can use it with [HeifConverter.withUrlLoader]:
  *
  * ```
- * HeifConverter.useContext(this)
+ * HeifConverter.create(this)
  *     .fromUrl("https://github.com/nokiatech/heif/raw/gh-pages/content/images/crowd_1440x960.heic")
  *     .withImageLoader(OkHttpUrlLoader())
  *     .convert { }
@@ -34,7 +34,7 @@ import kotlin.coroutines.resumeWithException
  *     header("Authorization", "Bearer $token")
  * }
  *
- * HeifConverter.useContext(this)
+ * HeifConverter.create(this)
  *     .fromUrl("https://github.com/nokiatech/heif/raw/gh-pages/content/images/crowd_1440x960.heic")
  *     .withImageLoader(imageLoader)
  *     .convert { }

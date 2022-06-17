@@ -169,7 +169,45 @@ class SampleClass(context: Context) {
 
 ## Custom Decoder
 
+If you need to customize the HEIC decoding behaviour you can either subclass `HeicDecoder.Default`
+or you can create your own `HeicDecoder` implementation.
+
+```kotlin
+class MyDecoder(context: Context) : HeicDecoder.Default(context) {
+
+    override suspend fun fromFile(file: File): Bitmap? {
+        // override the default behaviour
+    }
+}
+```
+
+Or create your own decoder:
+
+```kotlin
+class MyDecoder(context: Context) : HeicDecoder {
+
+    override suspend fun fromFile(file: File): Bitmap? {
+        // Decode the HEIC file yourself
+    }
+
+    // implement the rest
+}
+```
+
+Then set it when constructing `HeifConverter`:
+
+```kotlin
+val file: File = File("sample.heic")
+HeifConverter.create(contex)
+    .fromFile(file)
+    .withCustomDecoder(MyDecoder(context))
+    .convert { }
+```
+
 ### Glide decoder
+
+Alongside `HeicDecoder.Default` there is also `GlideHeicDecoder`. Which is useful for decoding HEIC
+on all versions of Android.
 
 To use the Glide decoder first you must include the dependency:
 
@@ -186,10 +224,8 @@ Then set the custom decoder when using `HeifConverter`:
 val file: File = File("sample.heic")
 HeifConverter.create(contex)
     .fromFile(file)
-    .customDecoder(GlideHeicDecoder(context))
-    .setCustomDecoder { result ->
-        // handle result
-    }
+    .withCustomDecoder(GlideHeicDecoder(context))
+    .convert { result -> /* handle result */ }
 ```
 
 Here is an example using the DSL:
@@ -227,11 +263,107 @@ val decoder = GlideHeicDecoder(context, useHardwareBitmaps = true)
 
 ## Custom URL loader
 
-TODO
+By default when using `HeifConverter.Input.URL` the `HeicDecoder.Default` uses `HttpURLConnection`
+to open a connection to the URL and return a `InputStream` that gets passed to the `HeicDecoder`.
+
+If you want to customize this. For example, adding authentication or other custom headers, you have
+three options:
+
+- Customize [HeicDecoder.UrlLoader.Default].
+- Implement your own `HeicDecoder.UrlLoader`.
+- Import and customize the `OkHttpUrlLoader`.
+
+### Customize Default URL loader
+
+You can override `HeicDecoder.UrlLoader.Default.download` to perform logging or analytics:
+
+```
+class MyImageLoader : HeicDecoder.UrlLoader.Default() {
+    override suspend fun download(url: String): InputStream {
+        Log.i("Downloading: $url")
+        return super.download(url)
+    }
+}
+```
+
+Or you can customize the [HttpURLConnection] object like so:
+
+```
+class MyImageLoader(private val auth: AuthRepo) : HeicDecoder.UrlLoader.Default() {
+    override fun customizeConnection(connection: HttpUrlConnection) {
+        val authToken = auth.getAuthToken()
+        connection.setRequestProperty("Authorization", "Bearer $authToken")
+    }
+}
+```
+
+Then set the custom decoder when using `HeifConverter`:
+
+```kotlin
+HeifConverter.create(contex)
+    .fromUrl("https://sample.com/image.heic")
+    .withUrlLoader(MyImageLoader())
+    .convert { result -> /* handle result */ }
+```
 
 ### OkHttp3 URL loader
 
-TODO
+If you prefer to use OkHttp instead you can import and use the `urlloader-okhttp3` dependency:
+
+```groovy
+implementation 'com.github.lincollincol:HEIF-converter:urlloader-okhttp3:v2.0'
+
+// Optional for using DSL syntax
+implementation 'com.github.lincollincol:HEIF-converter:heifconverter-dsl:v2.0'
+```
+
+Then set the custom url loader when using `HeifConverter`:
+
+```kotlin
+HeifConverter.create(contex)
+    .fromUrl("https://sample.com/image.heic")
+    .withUrlLoader(OkHttpUrlLoader())
+    .convert { result -> /* handle result */ }
+```
+
+Here is an example using the DSL:
+
+```kotlin
+val (bitmap, imagePath) = HeifConverter.convert(context, file) {
+    urlLoader(OkHttpUrlLoader())
+}
+```
+
+You also have the ability to customize the request before it is executed:
+
+```kotlin
+val token = "" // An auth token
+val imageLoader = OkHttpUrlLoader() {
+    header("Authorization", "Bearer $token")
+}
+```
+
+Or if you already have an instance of `OkHttpClient` that is configured for your app you can pass
+that into the constructor:
+
+```kotlin
+// Created elsewhere in the app
+private val okHttpClient = OkHttpClient.Builder()
+    .addInterceptor(
+        HttpLoggingInterceptor().apply { setLevel(HttpLoggingInterceptor.Level.BODY) }
+    )
+    .build()
+
+val imageLoader = OkHttpUrlLoader(okHttpClient)
+```
+
+Then add it to the `HeifConverter` builder:
+
+```kotlin
+HeifConverter.create(contex)
+    .fromUrl("https://sample.com/image.heic")
+    .withUrlLoader(OkHttpUrlLoader())
+```
 
 ### convert function
 

@@ -78,7 +78,7 @@ public interface HeicDecoder {
      */
     public open class Default(context: Context) : HeicDecoder {
 
-        private val decoder: HeicDecoder =
+        protected open val decoder: HeicDecoder =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) BitmapFactoryHeicDecoder(context)
             else HeifReaderHeicDecoder(context)
 
@@ -117,7 +117,7 @@ public interface HeicDecoder {
          * You can override [Default.download] to perform logging or analytics:
          *
          * ```
-         * class LoggingImageLoader : UrlLoader.Default() {
+         * class LoggingImageLoader : HeicDecoder.UrlLoader.Default() {
          *
          *     override suspend fun download(url: String): InputStream {
          *         Log.i("Downloading: $url")
@@ -126,10 +126,10 @@ public interface HeicDecoder {
          * }
          * ```
          *
-         * Or you can customise the [HttpURLConnection] object like so:
+         * Or you can customize the [HttpURLConnection] object like so:
          *
          * ```
-         * class AuthenticatedImageLoader(private val auth: AuthRepo) : UrlLoader.Default() {
+         * class AuthImageLoader(private val auth: AuthRepo) : HeicDecoder.UrlLoader.Default() {
          *
          *     override fun customizeConnection(connection: HttpUrlConnection) {
          *         val authToken = auth.getAuthToken()

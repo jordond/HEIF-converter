@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private val useGlide by lazy { findViewById<CheckBox>(R.id.useGlide) }
     private val useOkHttp by lazy { findViewById<CheckBox>(R.id.useOkHttp) }
 
+    // Create a custom OkHttpClient
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(
             HttpLoggingInterceptor()
@@ -35,7 +36,8 @@ class MainActivity : AppCompatActivity() {
         )
         .build()
 
-    private val OkHttpUrlLoader = OkHttpUrlLoader(okHttpClient) {
+    // Pass in the custom OkHttpClient and also customize the Request
+    private val okHttpUrlLoader = OkHttpUrlLoader(okHttpClient) {
         header("Foo", "Bar")
     }
 
@@ -76,7 +78,7 @@ class MainActivity : AppCompatActivity() {
                     customDecoder(GlideHeicDecoder(context = this@MainActivity))
                 }
                 if (useOkHttp.isChecked) {
-                    urlLoader(OkHttpUrlLoader)
+                    urlLoader(okHttpUrlLoader)
                 }
             }
             .convert(lifecycleScope) { result ->
@@ -99,7 +101,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 if (useOkHttp.isChecked) {
-                    withUrlLoader(OkHttpUrlLoader)
+                    withUrlLoader(okHttpUrlLoader)
                 }
             }
             .withOutputFormat(HeifConverter.Format.PNG)
