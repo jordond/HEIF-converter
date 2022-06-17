@@ -99,14 +99,56 @@ data class Options constructor(
 )
 ```
 
+### saveResultImage function
+
+* Set false, if you need bitmap only without saving.
+* You can skip this function if you want to save converted image, because it is true by default
+
+### saveFileWithName function
+
+* Use custom file name.
+* Skip this function if you don't need custom converted image name, because UUID generate unique
+  name by default.
+
+### withOutputQuality function
+
+* Use this function if you need custom output quality.
+* Skip this function if you don't need custom output quality, default quality - 100
+
+### withOutputFormat function
+
+* Set output image format.
+* Use values from HeifConverter.Format. (Current available: PNG, JPEG, WEBP).
+
+### from (Source)
+
+* Convert heic image from sources such file, url, bytes, input stream etc.
+* You can call this function only one time. If you call this function few times - converter will use
+  last called source.
+
+### Convert
+
+* Lambda, inside convert method, will return map of Objects. If you want to get result bitmap, you
+  need to get value by library key ``` HeifConverter.Key.BITMAP ``` and cast it to Bitmap
+
+* If you need path to converted image - use ``` HeifConverter.Key.IMAGE_PATH ``` key and cast map
+  value to String.
+
 ## DSL + extension syntax
 
 **Note:** Make sure you include the `heifconverter-dsl` dependency!
 
 Unlike the above builder syntax which returns a `Map<String, Any?>` all of the DSL and extension
-methods return a `HeifConverterResult` class.
+methods return a `HeifConverterResult` class:
 
-Using `HeifConverter.create`:
+```kotlin
+data class HeifConverterResult(
+    val bitmap: Bitmap?, // Null if the decode failed but didn't throw an exception
+    val imagePath: String?, // Only non-null if `saveResultImage` was true
+)
+```
+
+Which you can get by calling `HeifConverter.create` then `convert`:
 
 ```kotlin
 val inputUrl = "https://github.com/nokiatech/heif/raw/gh-pages/content/images/crowd_1440x960.heic"
@@ -364,41 +406,6 @@ HeifConverter.create(contex)
     .fromUrl("https://sample.com/image.heic")
     .withUrlLoader(OkHttpUrlLoader())
 ```
-
-### convert function
-
-* Lambda, inside convert method, will return map of Objects. If you want to get result bitmap, you
-  need to get value by library key ``` HeifConverter.Key.BITMAP ``` and cast it to Bitmap
-
-* If you need path to converted image - use ``` HeifConverter.Key.IMAGE_PATH ``` key and cast map
-  value to String.
-
-### saveResultImage function
-
-* Set false, if you need bitmap only without saving.
-* You can skip this function if you want to save converted image, because it is true by default
-
-### saveFileWithName function
-
-* Use custom file name.
-* Skip this function if you don't need custom converted image name, because UUID generate unique
-  name by default.
-
-### withOutputQuality function
-
-* Use this function if you need custom output quality.
-* Skip this function if you don't need custom output quality, default quality - 100
-
-### withOutputFormat function
-
-* Set output image format.
-* Use values from HeifConverter.Format. (Current available: PNG, JPEG, WEBP).
-
-### from (Source)
-
-* Convert heic image from sources such file, url, bytes, input stream etc.
-* You can call this function only one time. If you call this function few times - converter will use
-  last called source.
 
 ## Based on
 
