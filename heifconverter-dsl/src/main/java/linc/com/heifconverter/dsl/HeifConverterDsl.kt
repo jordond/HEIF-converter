@@ -152,14 +152,14 @@ public interface HeifConverterDsl {
     public fun useDefaultOutputPath(context: Context)
 
     /**
-     * A custom decoder for converting a HEIC [Input] to a [Bitmap].
+     * A custom decoder for converting a HEIC [Input] to a [Bitmap]. Default: [HeicDecoder.Default]
      *
      * @see HeifConverter.withCustomDecoder
      */
     public var customDecoder: HeicDecoder?
 
     /**
-     * A custom decoder for converting a HEIC [Input] to a [Bitmap].
+     * A custom decoder for converting a HEIC [Input] to a [Bitmap]. Default: [HeicDecoder.Default]
      *
      * @see HeifConverter.withCustomDecoder
      */

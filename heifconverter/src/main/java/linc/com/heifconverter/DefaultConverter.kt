@@ -11,7 +11,6 @@ import kotlinx.coroutines.withContext
 import linc.com.heifconverter.HeifConverter.Format
 import linc.com.heifconverter.HeifConverter.Key
 import linc.com.heifconverter.HeifConverter.Options
-import linc.com.heifconverter.decoder.DefaultHeicDecoder
 import linc.com.heifconverter.decoder.HeicDecoder
 import linc.com.heifconverter.decoder.decode
 import java.io.File
@@ -27,7 +26,7 @@ internal class DefaultConverter constructor(
      */
     override suspend fun convert(): Map<String, Any?> {
         val bitmap = withContext(Dispatchers.IO) {
-            val heicDecoder: HeicDecoder = options.decoder ?: DefaultHeicDecoder(context)
+            val heicDecoder: HeicDecoder = options.decoder ?: HeicDecoder.Default(context)
             heicDecoder.decode(input = options.input, urlLoader = options.urlLoader)
         } ?: return createResultMap(null)
 

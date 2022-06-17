@@ -201,10 +201,10 @@ public class HeifConverter internal constructor(
         saveToDirectory(File(pathToDirectory))
 
     /**
-     * Set a custom [HeicDecoder] for decoding the HEIC [Input] to a [Bitmap].
+     * Set a custom [HeicDecoder] for decoding the HEIC [Input] to a [Bitmap]. Default: [HeicDecoder.Default]
      *
      * @param[heicDecoder] A custom [HeicDecoder] implementation for decoding HEIC. If `null` then
-     * the default decoder will be used.
+     * the [HeicDecoder.Default] will be used.
      */
     public fun withCustomDecoder(heicDecoder: HeicDecoder?): HeifConverter = apply {
         updateOptions { copy(decoder = heicDecoder) }
