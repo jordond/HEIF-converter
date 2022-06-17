@@ -20,32 +20,34 @@ Converter for High Efficiency Image Format(HEIF) to other image format
 
 ## Download
 
-``` groovy
+```groovy
 allprojects {
-  repositories {
-    maven { url 'https://jitpack.io' }
-  }
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
 }
 ```
 
-``` groovy
+```groovy
 dependencies {
-  // Include everything
-  implementation 'com.github.lincollincol:HEIF-converter:v2.0'
-  
-  // Or you can add them indiviually
-  
-  // Main library
-  implementation 'com.github.lincollincol:HEIF-converter:heifconverter:v2.0'
-  
-  // Optional DSL + extension library
-  implementation 'com.github.lincollincol:HEIF-converter:heifconverter-dsl:v2.0'
-  
-  // Optional Decoder using Glide (see below about Android <= 9)
-  implementation 'com.github.lincollincol:HEIF-converter:decoder-glide:v2.0'
-  
-  // Optional OkHttp3 HeidDecoder.ImageLoader for loading URLs
-  implementation 'com.github.lincollincol:HEIF-converter:imageloader-okhttp3:v2.0'
+    def latest_version = "v2.0"
+
+    // Include everything
+    implementation("com.github.lincollincol:HEIF-converter:$latest_version")
+
+    // Or you can add them indiviually
+
+    // Main library
+    implementation("com.github.lincollincol:HEIF-converter:heifconverter:$latest_version")
+
+    // Optional DSL + extension library
+    implementation("com.github.lincollincol:HEIF-converter:heifconverter-dsl:$latest_version")
+
+    // Optional Decoder using Glide (see below about Android <= 9)
+    implementation("com.github.lincollincol:HEIF-converter:decoder-glide:$latest_version")
+
+    // Optional OkHttp3 HeidDecoder.ImageLoader for loading URLs
+    implementation("com.github.lincollincol:HEIF-converter:imageloader-okhttp3:$latest_version")
 }
 ```
 
@@ -254,10 +256,10 @@ on all versions of Android.
 To use the Glide decoder first you must include the dependency:
 
 ```groovy
-implementation 'com.github.lincollincol:HEIF-converter:decoder-glide:v2.0'
+implementation("com.github.lincollincol:HEIF-converter:decoder-glide:$latest_version")
 
 // Optional for using DSL syntax
-implementation 'com.github.lincollincol:HEIF-converter:heifconverter-dsl:v2.0'
+implementation("com.github.lincollincol:HEIF-converter:heifconverter-dsl:$latest_version")
 ```
 
 Then set the custom decoder when using `HeifConverter`:
@@ -353,10 +355,7 @@ HeifConverter.create(contex)
 If you prefer to use OkHttp instead you can import and use the `urlloader-okhttp3` dependency:
 
 ```groovy
-implementation 'com.github.lincollincol:HEIF-converter:urlloader-okhttp3:v2.0'
-
-// Optional for using DSL syntax
-implementation 'com.github.lincollincol:HEIF-converter:heifconverter-dsl:v2.0'
+implementation("com.github.lincollincol:HEIF-converter:urlloader-okhttp3:$latest_version")
 ```
 
 Then set the custom url loader when using `HeifConverter`:
