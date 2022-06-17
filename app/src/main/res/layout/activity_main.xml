@@ -54,7 +54,7 @@
         app:layout_constraintBottom_toTopOf="@id/convert"
         app:layout_constraintEnd_toStartOf="@+id/useGlide"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/resultImage"
+        app:layout_constraintStart_toEndOf="@+id/useOkHttp"
         />
 
     <CheckBox
@@ -63,10 +63,22 @@
         android:layout_height="wrap_content"
         android:checked="false"
         android:text="Use Glide Decoder"
-        app:layout_constraintBottom_toTopOf="@id/convert"
         app:layout_constraintEnd_toStartOf="@+id/resultImage"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/useDsl"
+        app:layout_constraintTop_toTopOf="@id/useDsl"
+        />
+
+    <CheckBox
+        android:id="@+id/useOkHttp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:text="Use OkHttp"
+        app:layout_constraintEnd_toStartOf="@+id/useDsl"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/resultImage"
+        app:layout_constraintTop_toTopOf="@id/useDsl"
         />
 
     <Button

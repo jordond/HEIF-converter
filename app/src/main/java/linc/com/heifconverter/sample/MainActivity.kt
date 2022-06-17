@@ -12,9 +12,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.scale
 import androidx.lifecycle.lifecycleScope
 import linc.com.heifconverter.HeifConverter
+import linc.com.heifconverter.decoder.OkHttpImageLoader
 import linc.com.heifconverter.decoder.glide.GlideHeicDecoder
 import linc.com.heifconverter.dsl.HeifConverterResult
 import linc.com.heifconverter.dsl.extension.create
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,6 +26,18 @@ class MainActivity : AppCompatActivity() {
     private val progress by lazy { findViewById<ProgressBar>(R.id.progress) }
     private val convert by lazy { findViewById<Button>(R.id.convert) }
     private val useGlide by lazy { findViewById<CheckBox>(R.id.useGlide) }
+    private val useOkHttp by lazy { findViewById<CheckBox>(R.id.useOkHttp) }
+
+    private val okHttpClient = OkHttpClient.Builder()
+        .addInterceptor(
+            HttpLoggingInterceptor()
+                .apply { setLevel(HttpLoggingInterceptor.Level.BODY) }
+        )
+        .build()
+
+    private val okhttpImageLoader = OkHttpImageLoader(okHttpClient) {
+        header("Foo", "Bar")
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +75,9 @@ class MainActivity : AppCompatActivity() {
                 if (useGlide.isChecked) {
                     customDecoder(GlideHeicDecoder(context = this@MainActivity))
                 }
+                if (useOkHttp.isChecked) {
+                    imageLoader(okhttpImageLoader)
+                }
             }
             .convert(lifecycleScope) { result ->
                 stop()
@@ -78,6 +96,10 @@ class MainActivity : AppCompatActivity() {
 
                 if (useGlide.isChecked) {
                     withCustomDecoder(GlideHeicDecoder(context = this@MainActivity))
+                }
+
+                if (useOkHttp.isChecked) {
+                    withImageLoader(okhttpImageLoader)
                 }
             }
             .withOutputFormat(HeifConverter.Format.PNG)
