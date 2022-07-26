@@ -377,6 +377,11 @@ public class HeifConverter internal constructor(
         public class ByteArray(public val data: kotlin.ByteArray) : Input()
         public class Uri(public val data: android.net.Uri) : Input()
         public object None : Input()
+
+        /**
+         * A stub so extension functions can be created in `heifconverter-dsl` module
+         */
+        public companion object
     }
 
     internal interface Converter {

@@ -19,6 +19,7 @@ import linc.com.heifconverter.decoder.OkHttpUrlLoader
 import linc.com.heifconverter.decoder.glide.GlideHeicDecoder
 import linc.com.heifconverter.dsl.HeifConverterResult
 import linc.com.heifconverter.dsl.extension.create
+import linc.com.heifconverter.dsl.extension.from
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 
@@ -161,8 +162,7 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (data != null && requestCode == REQUEST_HEIC_GET && resultCode == Activity.RESULT_OK) {
             val uri: Uri = data.data ?: return
-            val input = HeifConverter.Input.Uri(uri)
-            useDsl(input)
+            useDsl(HeifConverter.Input.from(uri))
 
             return
         }
