@@ -375,6 +375,7 @@ public class HeifConverter internal constructor(
         public class Resources(@RawRes public val data: Int) : Input()
         public class InputStream(public val data: java.io.InputStream) : Input()
         public class ByteArray(public val data: kotlin.ByteArray) : Input()
+        public class Uri(public val data: android.net.Uri) : Input()
         public object None : Input()
     }
 

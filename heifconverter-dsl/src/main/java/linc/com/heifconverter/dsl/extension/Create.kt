@@ -2,6 +2,7 @@ package linc.com.heifconverter.dsl.extension
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.annotation.RawRes
 import linc.com.heifconverter.HeifConverter
 import linc.com.heifconverter.HeifConverter.Input
@@ -223,6 +224,48 @@ public fun HeifConverter.Companion.create(
     options: HeifConverter.Options = HeifConverter.Options(),
     block: HeifConverterDsl.() -> Unit = {},
 ): HeifConverterInstance = create(context, Input.ByteArray(byteArray), options, block)
+
+/**
+ * A DSL builder for creating a [HeifConverter] with a [Uri] input.
+ *
+ * Example:
+ *
+ * ```
+ * val uri = // Get from MediaStore
+ * val converter = HeifConverter.create(context, uri) {
+ *     saveResultImage = true
+ *     outputDirectory = File(context.cacheDir)
+ * }
+ *
+ * val result = converter.convert()
+ * ```
+ *
+ * Or you can pass in a [HeifConverter.Options] instance:
+ *
+ * ```
+ * val options = HeifConverter.Options.build {
+ *     saveResultImage = true
+ *     outputQuality(50)
+ *     outputDirectory(context.cacheDir)
+ * }
+ *
+ * val uri = // Get from MediaStore
+ * val result = HeifConverter.create(context, uri, options).convert()
+ * ```
+ *
+ * @param[context] [Context] reference to initialize [HeifConverter].
+ * @param[uri] Input HEIC data as a [Uri].
+ * @param[options] Optional [HeifConverter.Options] instance to configure [HeifConverter].
+ * @param[block] A lambda scoped to [HeifConverterDsl] for building a [HeifConverter].
+ * @return A [HeifConverterInstance] for converting the [Uri].
+ * @see HeifConverterDsl for all available options.
+ */
+public fun HeifConverter.Companion.create(
+    context: Context,
+    uri: Uri,
+    options: HeifConverter.Options = HeifConverter.Options(),
+    block: HeifConverterDsl.() -> Unit = {},
+): HeifConverterInstance = create(context, Input.Uri(uri), options, block)
 
 /**
  * A DSL builder for creating a [HeifConverter].

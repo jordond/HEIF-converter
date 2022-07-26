@@ -3,6 +3,7 @@ package linc.com.heifconverter.decoder.glide
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.bumptech.glide.Glide
@@ -94,6 +95,11 @@ public class GlideHeicDecoder(private val context: Context) : HeicDecoder {
         return if (urlLoader == null) glideBuilder.load(url).decode()
         else fromInputStream(urlLoader.download(url))
     }
+
+    /**
+     * @see HeicDecoder.fromUri
+     */
+    override suspend fun fromUri(uri: Uri): Bitmap? = glideBuilder.load(uri).decode()
 }
 
 /**

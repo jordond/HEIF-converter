@@ -3,6 +3,7 @@ package linc.com.heifconverter.decoder
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Build
 import androidx.annotation.CallSuper
 import androidx.annotation.RawRes
@@ -51,6 +52,8 @@ public interface HeicDecoder {
         return fromInputStream(loader.download(url))
     }
 
+    public suspend fun fromUri(uri: Uri): Bitmap?
+
     /**
      * Default implementation of [HeicDecoder].
      *
@@ -76,23 +79,7 @@ public interface HeicDecoder {
      *
      * @constructor A instance of the default [HeicDecoder].
      */
-    public open class Default(context: Context) : HeicDecoder {
-
-        protected open val decoder: HeicDecoder =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) BitmapFactoryHeicDecoder(context)
-            else HeifReaderHeicDecoder(context)
-
-        override suspend fun fromByteArray(byteArray: ByteArray): Bitmap? =
-            decoder.fromByteArray(byteArray)
-
-        override suspend fun fromFile(file: File): Bitmap? = decoder.fromFile(file)
-
-        override suspend fun fromInputStream(stream: InputStream): Bitmap? =
-            decoder.fromInputStream(stream)
-
-        override suspend fun fromResources(resId: Int): Bitmap? = decoder.fromResources(resId)
-    }
-
+    public open class Default(context: Context) : HeicDecoder by context.defaultDecoder()
 
     /**
      * A class for implementing how to download a URL [String] to a [InputStream] that can be
@@ -183,7 +170,12 @@ internal suspend fun HeicDecoder.decode(
     is HeifConverter.Input.InputStream -> fromInputStream(input.data)
     is HeifConverter.Input.Resources -> fromResources(input.data)
     is HeifConverter.Input.Url -> fromUrl(input.data, urlLoader)
+    is HeifConverter.Input.Uri -> fromUri(input.data)
     else -> throw IllegalStateException(
         "You forget to pass input type: File, Url etc. Use such functions: fromFile() etc."
     )
 }
+
+private fun Context.defaultDecoder(): HeicDecoder =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) BitmapFactoryHeicDecoder(this)
+    else HeifReaderHeicDecoder(this)

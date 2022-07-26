@@ -2,6 +2,7 @@ package linc.com.heifconverter.dsl.extension
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.annotation.RawRes
 import linc.com.heifconverter.HeifConverter
 import linc.com.heifconverter.dsl.HeifConverterDsl
@@ -225,6 +226,49 @@ public suspend fun HeifConverter.Companion.convert(
     options: HeifConverter.Options = HeifConverter.Options(),
     block: HeifConverterDsl.() -> Unit = {},
 ): HeifConverterResult = create(context, byteArray, options, block).convert()
+
+/**
+ * A DSL builder for converting a HEIC from [ByteArray] to a [Bitmap].
+ *
+ * DSL example:
+ *
+ * ```
+ * val uri = // get from MediaStore
+ * val result = HeifConverter.convert(context, uri) {
+ *     saveResultImage = true
+ *     outputName = "image"
+ *     outputDirectory = File(context.cacheDir)
+ *     outputFormat = HeifConverter.Format.JPEG
+ * }
+ * ```
+ *
+ * Or you can pass in a [HeifConverter.Options] instance:
+ *
+ * ```
+ * val options = HeifConverter.Options.build {
+ *     saveResultImage = true
+ *     outputQuality(50)
+ *     outputDirectory(context.cacheDir)
+ * }
+ *
+ * val uri = // get from MediaStore
+ * val result = HeifConverter.convert(context, uri, options)
+ * ```
+ *
+ * @param[context] [Context] reference to initialize [HeifConverter].
+ * @param[uri] Input HEIC data as a [Uri].
+ * @param[options] Optional [HeifConverter.Options] instance to configure [HeifConverter].
+ * @param[block] A lambda scoped to [HeifConverterDsl] for customizing the conversion.
+ * @return Result mapped to an instance of [HeifConverterResult]
+ * @see HeifConverter.convertBlocking for more info.
+ * @see HeifConverterDsl for all available options.
+ */
+public suspend fun HeifConverter.Companion.convert(
+    context: Context,
+    uri: Uri,
+    options: HeifConverter.Options = HeifConverter.Options(),
+    block: HeifConverterDsl.() -> Unit = {},
+): HeifConverterResult = create(context, uri, options, block).convert()
 
 /**
  * A DSL builder for creating a [HeifConverter].

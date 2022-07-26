@@ -1,5 +1,8 @@
 package linc.com.heifconverter.sample
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -24,9 +27,11 @@ class MainActivity : AppCompatActivity() {
     private val optionUrl by lazy { findViewById<RadioButton>(R.id.optionUrl) }
     private val optionResource by lazy { findViewById<RadioButton>(R.id.optionResource) }
     private val progress by lazy { findViewById<ProgressBar>(R.id.progress) }
+    private val chooseFile by lazy { findViewById<Button>(R.id.chooseFile) }
     private val convert by lazy { findViewById<Button>(R.id.convert) }
     private val useGlide by lazy { findViewById<CheckBox>(R.id.useGlide) }
     private val useOkHttp by lazy { findViewById<CheckBox>(R.id.useOkHttp) }
+    private val resultImage by lazy { findViewById<ImageView>(R.id.resultImage) }
 
     // Create a custom OkHttpClient
     private val okHttpClient = OkHttpClient.Builder()
@@ -45,15 +50,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val resultImage = findViewById<ImageView>(R.id.resultImage)
         val useDsl = findViewById<CheckBox>(R.id.useDsl)
 
         progress.visibility = View.GONE
 
+        chooseFile.setOnClickListener {
+            chooseHeic()
+        }
+
         convert.setOnClickListener {
             start()
-            if (useDsl.isChecked) useDsl(resultImage)
-            else useBuilder(resultImage)
+            if (useDsl.isChecked) useDsl()
+            else useBuilder()
         }
     }
 
@@ -67,9 +75,9 @@ class MainActivity : AppCompatActivity() {
         progress.visibility = View.GONE
     }
 
-    private fun useDsl(resultImage: ImageView) {
+    private fun useDsl(source: HeifConverter.Input? = null) {
         HeifConverter
-            .create(this, getSource()) {
+            .create(this, source ?: getSource()) {
                 outputFormat = HeifConverter.Format.PNG
                 outputQuality(100)
                 outputName("Image_Converted_Name")
@@ -87,7 +95,7 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    private fun useBuilder(resultImage: ImageView) {
+    private fun useBuilder() {
         HeifConverter.create(this)
             .apply {
                 when (val source = getSource()) {
@@ -139,7 +147,33 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    private fun chooseHeic() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+            type = "image/heic"
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/heic", "image/heif"))
+        }
+
+        startActivityForResult(intent, REQUEST_HEIC_GET)
+    }
+
+    @Suppress("OVERRIDE_DEPRECATION")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (data != null && requestCode == REQUEST_HEIC_GET && resultCode == Activity.RESULT_OK) {
+            val uri: Uri = data.data ?: return
+            val input = HeifConverter.Input.Uri(uri)
+            useDsl(input)
+
+            return
+        }
+
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
+
     companion object {
+
+        const val REQUEST_HEIC_GET = 1
 
         private const val URL = "https://github.com/nokiatech/heif/raw/gh-pages/content/images/crowd_1440x960.heic"
     }
