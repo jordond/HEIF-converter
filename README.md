@@ -35,7 +35,7 @@ dependencies {
     // Include everything
     implementation("com.github.lincollincol:HEIF-converter:$latest_version")
 
-    // Or you can add them indiviually
+    // Or you can add them individually
 
     // Main library
     implementation("com.github.lincollincol:HEIF-converter:heifconverter:$latest_version")
@@ -46,7 +46,7 @@ dependencies {
     // Optional Decoder using Glide (see below about Android <= 9)
     implementation("com.github.lincollincol:HEIF-converter:decoder-glide:$latest_version")
 
-    // Optional OkHttp3 HeidDecoder.ImageLoader for loading URLs
+    // Optional OkHttp3 HeifDecoder.ImageLoader for loading URLs
     implementation("com.github.lincollincol:HEIF-converter:imageloader-okhttp3:$latest_version")
 }
 ```
@@ -379,7 +379,7 @@ You also have the ability to customize the request before it is executed:
 
 ```kotlin
 val token = "" // An auth token
-val imageLoader = OkHttpUrlLoader() {
+val imageLoader = OkHttpUrlLoader {
     header("Authorization", "Bearer $token")
 }
 ```
