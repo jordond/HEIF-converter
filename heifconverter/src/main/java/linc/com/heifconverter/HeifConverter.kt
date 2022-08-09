@@ -379,7 +379,7 @@ public class HeifConverter internal constructor(
         public object None : Input()
 
         /**
-         * A stub so extension functions can be created in `heifconverter-dsl` module
+         * A stub so extension functions can be created in `:heifconverter-dsl` module
          */
         public companion object
     }

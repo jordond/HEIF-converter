@@ -321,7 +321,7 @@ three options:
 
 You can override `HeicDecoder.UrlLoader.Default.download` to perform logging or analytics:
 
-```
+```kotlin
 class MyImageLoader : HeicDecoder.UrlLoader.Default() {
     override suspend fun download(url: String): InputStream {
         Log.i("Downloading: $url")
@@ -332,7 +332,7 @@ class MyImageLoader : HeicDecoder.UrlLoader.Default() {
 
 Or you can customize the [HttpURLConnection] object like so:
 
-```
+```kotlin
 class MyImageLoader(private val auth: AuthRepo) : HeicDecoder.UrlLoader.Default() {
     override fun customizeConnection(connection: HttpUrlConnection) {
         val authToken = auth.getAuthToken()
