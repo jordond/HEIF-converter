@@ -30,24 +30,21 @@ allprojects {
 
 ```groovy
 dependencies {
-    def latest_version = "v2.0"
+    def latest_version = "3.0.0"
 
     // Include everything
-    implementation("com.github.lincollincol:HEIF-converter:$latest_version")
+    implementation("com.github.lincollincol:heif-converter:$latest_version")
 
     // Or you can add them individually
 
     // Main library
-    implementation("com.github.lincollincol:HEIF-converter:heifconverter:$latest_version")
+    implementation("com.github.lincollincol:heif-converter:heifconverter:$latest_version")
 
     // Optional DSL + extension library
-    implementation("com.github.lincollincol:HEIF-converter:heifconverter-dsl:$latest_version")
-
-    // Optional Decoder using Glide (see below about Android <= 9)
-    implementation("com.github.lincollincol:HEIF-converter:decoder-glide:$latest_version")
+    implementation("com.github.lincollincol:heif-converter:heifconverter-dsl:$latest_version")
 
     // Optional OkHttp3 HeifDecoder.ImageLoader for loading URLs
-    implementation("com.github.lincollincol:HEIF-converter:imageloader-okhttp3:$latest_version")
+    implementation("com.github.lincollincol:heif-converter:imageloader-okhttp3:$latest_version")
 }
 ```
 
@@ -76,12 +73,8 @@ an `ImageView`.
 
 ## Android 9 and lower
 
-If you are using this and need to support Android API 28 (9 Pie) or lower. Then there is a good
-chance the converter will crash because the current implementation of the `HeifReader` class does
-not support all types of HEIF files.
-
-To fix this you can use a custom `HeifConverter.HeicDecoder` instance. You can create one yourself,
-but one is provided in the `:decoder-glide` module.
+If you are using this and need to support Android API 28 (9 Pie) or lower then by default the
+GlideDecoder will be used. This is because the default decoder uses the Android 10+ API.
 
 ## Customizing the conversion
 
@@ -89,7 +82,7 @@ Look at `HeifConverter.Options` to see all the available options and their defau
 builder and DSL-builder provide methods for changing all of the options.
 
 ```kotlin
-data class Options constructor(
+data class Options(
     val input: Input = None,
     val saveResultImage: Boolean = true, // Save the converting Bitmap to the disk
     val outputQuality: Int = 100, // Quality of the saved image 0-100
@@ -253,15 +246,6 @@ HeifConverter.create(contex)
 Alongside `HeicDecoder.Default` there is also `GlideHeicDecoder`. Which is useful for decoding HEIC
 on all versions of Android.
 
-To use the Glide decoder first you must include the dependency:
-
-```groovy
-implementation("com.github.lincollincol:HEIF-converter:decoder-glide:$latest_version")
-
-// Optional for using DSL syntax
-implementation("com.github.lincollincol:HEIF-converter:heifconverter-dsl:$latest_version")
-```
-
 Then set the custom decoder when using `HeifConverter`:
 
 ```kotlin
@@ -283,9 +267,7 @@ val (bitmap, imagePath) = HeifConverter.convert(context, file) {
 If you only want to use the Glide decoder on Android 9 and lower:
 
 ```kotlin
-val decoder: HeifConverter.HeicDecoder? =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) null
-    else GildeHeicDecoder(context)
+val decoder: HeifConverter.HeicDecoder = HeicDecoder.default(context)
 
 val (bitmap, imagePath) = HeifConverter.convert(context, file) {
     customDecoder = decoder

@@ -155,6 +155,7 @@ class MainActivity : AppCompatActivity() {
             putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/heic", "image/heif"))
         }
 
+        @Suppress("DEPRECATION")
         startActivityForResult(intent, REQUEST_HEIC_GET)
     }
 

@@ -2,7 +2,6 @@ package linc.com.heifconverter.decoder
 
 import androidx.annotation.CallSuper
 import kotlinx.coroutines.suspendCancellableCoroutine
-import linc.com.heifconverter.HeifConverter
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -15,8 +14,6 @@ import kotlin.coroutines.resumeWithException
 
 /**
  * An implementation of [HeicDecoder.UrlLoader] that uses [OkHttpClient] to make the request.
- *
- * You can use it with [HeifConverter.withUrlLoader]:
  *
  * ```
  * HeifConverter.create(this)
