@@ -2,7 +2,7 @@
 
 buildscript {
     ext.kotlin_version = '1.9.10'
-    ext.coroutines_version = "1.6.2"
+    ext.coroutines_version = "1.7.3"
     ext.parser_version = "1.9.41"
 
     repositories {
@@ -26,7 +26,6 @@ ext {
     minSdkVersion = 21
     targetSdkVersion = 34
     compileSdkVersion = 34
-    buildToolsVersion = '34.0.0'
 }
 
 allprojects {
