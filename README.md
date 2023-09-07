@@ -30,7 +30,7 @@ allprojects {
 
 ```groovy
 dependencies {
-    def latest_version = "3.0.0"
+    def latest_version = "3.0.1"
 
     // Include everything
     implementation("com.github.lincollincol:heif-converter:$latest_version")
