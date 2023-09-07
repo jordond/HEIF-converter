@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'com.google.devtools.ksp'
 }
 
 android {
@@ -23,14 +25,9 @@ android {
 }
 
 dependencies {
-    api project(":decoder")
-
     // Androidx
     api 'androidx.annotation:annotation:1.7.0'
 
-    // OkHttp
-    api("com.squareup.okhttp3:okhttp:4.11.0")
-
     // Coroutines
-    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
 }

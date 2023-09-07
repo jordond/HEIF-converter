@@ -13,10 +13,11 @@ import linc.com.heifconverter.HeifConverter.Key
 import linc.com.heifconverter.HeifConverter.Options
 import linc.com.heifconverter.decoder.HeicDecoder
 import linc.com.heifconverter.decoder.decode
+import linc.com.heifconverter.decoder.default
 import java.io.File
 import java.io.FileOutputStream
 
-internal class DefaultConverter constructor(
+internal class DefaultConverter(
     private val context: Context,
     private val options: Options,
 ) : HeifConverter.Converter {
@@ -26,7 +27,7 @@ internal class DefaultConverter constructor(
      */
     override suspend fun convert(): Map<String, Any?> {
         val bitmap = withContext(Dispatchers.IO) {
-            val heicDecoder: HeicDecoder = options.decoder ?: HeicDecoder.Default(context)
+            val heicDecoder: HeicDecoder = options.decoder ?: HeicDecoder.default(context)
             heicDecoder.decode(input = options.input, urlLoader = options.urlLoader)
         } ?: return createResultMap(null)
 

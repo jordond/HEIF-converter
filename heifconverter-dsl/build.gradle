@@ -12,11 +12,6 @@ android {
         targetSdk rootProject.targetSdkVersion
     }
 
-//    compileOptions {
-//        sourceCompatibility 1.8
-//        targetCompatibility 1.8
-//    }
-
     kotlin {
         jvmToolchain(11)
     }
@@ -28,6 +23,7 @@ android {
 
 dependencies {
     implementation project(":heifconverter")
+    api project(":decoder")
 
     // Androidx
     api 'androidx.annotation:annotation:1.7.0'
