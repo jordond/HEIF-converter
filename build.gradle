@@ -3,7 +3,6 @@
 buildscript {
     ext.kotlin_version = '1.9.10'
     ext.coroutines_version = "1.7.3"
-    ext.parser_version = "1.9.41"
 
     repositories {
         google()
