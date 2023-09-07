@@ -10,7 +10,6 @@ import androidx.annotation.RawRes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import linc.com.heifconverter.HeifConverter
-import linc.com.heifconverter.decoder.legacy.HeifReaderHeicDecoder
 import java.io.File
 import java.io.InputStream
 import java.net.HttpURLConnection
@@ -178,4 +177,25 @@ internal suspend fun HeicDecoder.decode(
 
 private fun Context.defaultDecoder(): HeicDecoder =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) BitmapFactoryHeicDecoder(this)
-    else HeifReaderHeicDecoder(this)
+    else object : HeicDecoder {
+        override suspend fun fromByteArray(byteArray: ByteArray): Bitmap? {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun fromFile(file: File): Bitmap? {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun fromInputStream(stream: InputStream): Bitmap? {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun fromResources(resId: Int): Bitmap? {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun fromUri(uri: Uri): Bitmap? {
+            TODO("Not yet implemented")
+        }
+
+    }
