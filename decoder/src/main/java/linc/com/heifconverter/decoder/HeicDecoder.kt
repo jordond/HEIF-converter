@@ -72,7 +72,18 @@ public interface HeicDecoder {
     /**
      * Used for extension functions.
      */
-    public companion object {}
+    public companion object {
+
+        public var fallbackInstance: HeicDecoder? = null
+            internal set
+
+        /**
+         * Set a fallback [HeicDecoder] to use if you have not included any.
+         */
+        public fun setFallback(decoder: HeicDecoder) {
+            fallbackInstance = decoder
+        }
+    }
 
     /**
      * A class for implementing how to download a URL [String] to a [InputStream] that can be

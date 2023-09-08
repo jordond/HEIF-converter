@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
 import linc.com.heifconverter.HeifConverter
-import linc.com.heifconverter.decoder.glide.GlideHeicDecoder
 
 /**
  * Decode the [input] HEIC into a [Bitmap].
@@ -13,11 +12,12 @@ import linc.com.heifconverter.decoder.glide.GlideHeicDecoder
  * @param[input] The HEIC [HeifConverter.Input] source to decode.
  * @param[urlLoader] Optional [HeicDecoder.UrlLoader] for downloading [HeifConverter.Input.Url].
  * @return The decoded [Bitmap] or `null`.
+ * @throws[Throwable] if an error occurs during decoding.
  */
 internal suspend fun HeicDecoder.decode(
     input: HeifConverter.Input,
     urlLoader: HeicDecoder.UrlLoader? = null,
-): Bitmap? = when (input) {
+): Bitmap = when (input) {
     is HeifConverter.Input.ByteArray -> fromByteArray(input.data)
     is HeifConverter.Input.File -> fromFile(input.data)
     is HeifConverter.Input.InputStream -> fromInputStream(input.data)
@@ -53,4 +53,8 @@ internal suspend fun HeicDecoder.decode(
  */
 public fun HeicDecoder.Companion.default(context: Context): HeicDecoder =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) BitmapFactoryHeicDecoder(context)
-    else GlideHeicDecoder(context)
+    else fallbackInstance ?: error(
+        "No fallback decoder found for Android <29, make sure you import one of the " +
+            "following dependencies: `decoder-glide`, `decoder-coil`, or implement your own " +
+            "decoder. And calling HeicDecoder.setFallback()"
+    )

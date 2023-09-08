@@ -1,4 +1,4 @@
-package linc.com.heifconverter.decoder.glide
+package linc.com.heifconverter.decoder.coil
 
 import android.content.Context
 import android.graphics.Bitmap

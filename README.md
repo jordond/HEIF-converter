@@ -30,21 +30,22 @@ allprojects {
 
 ```groovy
 dependencies {
-    def latest_version = "3.0.3"
+  def latest_version = "3.1.0"
 
-    // Include everything
-    implementation("com.github.lincollincol:heif-converter:$latest_version")
+  // Main library
+  implementation("com.github.lincollincol:heif-converter:heifconverter:$latest_version")
 
-    // Or you can add them individually
+  // To support Android 9 and lower you need to include ONE of the following dependencies:
+  // Use Glide for decoding
+  implementation("com.github.lincollincol:heif-converter:decoder-glide:$latest_version")
+  // Use coil for decoding
+  implementation("com.github.lincollincol:heif-converter:decoder-coil:$latest_version")
 
-    // Main library
-    implementation("com.github.lincollincol:heif-converter:heifconverter:$latest_version")
+  // Optional DSL + extension library
+  implementation("com.github.lincollincol:heif-converter:heifconverter-dsl:$latest_version")
 
-    // Optional DSL + extension library
-    implementation("com.github.lincollincol:heif-converter:heifconverter-dsl:$latest_version")
-
-    // Optional OkHttp3 HeifDecoder.ImageLoader for loading URLs
-    implementation("com.github.lincollincol:heif-converter:imageloader-okhttp3:$latest_version")
+  // Optional OkHttp3 HeifDecoder.ImageLoader for loading URLs
+  implementation("com.github.lincollincol:heif-converter:imageloader-okhttp3:$latest_version")
 }
 ```
 
@@ -73,8 +74,9 @@ an `ImageView`.
 
 ## Android 9 and lower
 
-If you are using this and need to support Android API 28 (9 Pie) or lower then by default the
-GlideDecoder will be used. This is because the default decoder uses the Android 10+ API.
+If you are using this and need to support Android API 28 (9 Pie) or lower then you need to include
+either the `decoder-glide` or `decoder-coil` dependency. Or you can implement your own and pass
+call `HeicDecoder.setFallback()`.
 
 ## Customizing the conversion
 

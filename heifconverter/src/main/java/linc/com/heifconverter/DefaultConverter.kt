@@ -29,7 +29,7 @@ internal class DefaultConverter(
         val bitmap = withContext(Dispatchers.IO) {
             val heicDecoder: HeicDecoder = options.decoder ?: HeicDecoder.default(context)
             heicDecoder.decode(input = options.input, urlLoader = options.urlLoader)
-        } ?: return createResultMap(null)
+        }
 
         // Return early if we don't need to save the bitmap
         if (!options.saveResultImage || options.pathToSaveDirectory == null) {

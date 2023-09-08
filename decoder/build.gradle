@@ -26,6 +26,7 @@ android {
 dependencies {
     // Androidx
     api 'androidx.annotation:annotation:1.7.0'
+    implementation "androidx.startup:startup-runtime:1.1.1"
 
     // Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
