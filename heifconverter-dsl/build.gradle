@@ -23,7 +23,7 @@ android {
 
 dependencies {
     implementation project(":heifconverter")
-    api project(":decoder")
+    implementation project(":decoder")
 
     // Androidx
     api 'androidx.annotation:annotation:1.7.0'

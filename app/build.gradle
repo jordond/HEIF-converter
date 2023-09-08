@@ -32,7 +32,6 @@ dependencies {
 
     implementation project(":heifconverter")
     implementation project(':heifconverter-dsl')
-    implementation project(":decoder-glide")
     implementation project(':urlloader-okhttp3')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])

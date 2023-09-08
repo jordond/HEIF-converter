@@ -34,8 +34,8 @@ dependencies {
     // local
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation project(":decoder")
-    implementation project(":decoder-glide")
+    api project(":decoder")
+    api project(":decoder-glide")
 
     // AndroidX
     implementation 'androidx.appcompat:appcompat:1.6.1'
