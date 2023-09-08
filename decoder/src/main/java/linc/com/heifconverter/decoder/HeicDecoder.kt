@@ -18,39 +18,56 @@ public interface HeicDecoder {
 
     /**
      * Decode a HEIC [ByteArray] into a [Bitmap].
+     * @return Decoded [Bitmap].
+     * @throws [Throwable] if the [ByteArray] is not a valid HEIC file.
      */
-    public suspend fun fromByteArray(byteArray: ByteArray): Bitmap?
+    public suspend fun fromByteArray(byteArray: ByteArray): Bitmap
 
     /**
      * Decode a HEIC [File] into a [Bitmap].
+     *
+     * @return Decoded [Bitmap].
+     * @throws [Throwable] if the [File] is not a valid HEIC file, or not a valid path.
      */
-    public suspend fun fromFile(file: File): Bitmap?
+    public suspend fun fromFile(file: File): Bitmap
 
     /**
      * Decode a HEIC [InputStream] into a [Bitmap].
+     *
+     * @return Decoded [Bitmap].
+     * @throws [Throwable] if the [InputStream] is not a valid HEIC file.
      */
-    public suspend fun fromInputStream(stream: InputStream): Bitmap?
+    public suspend fun fromInputStream(stream: InputStream): Bitmap
 
     /**
      * Decode a HEIC [RawRes] resource id [resId] into a [Bitmap].
+     *
+     * @return Decoded [Bitmap].
+     * @throws [Throwable] if the [RawRes] resource id [resId] is not a valid HEIC file.
      */
-    public suspend fun fromResources(@RawRes resId: Int): Bitmap?
+    public suspend fun fromResources(@RawRes resId: Int): Bitmap
 
     /**
      * Decode a HEIC [ByteArray] into a [Bitmap].
+     *
+     * @return Decoded [Bitmap].
+     * @throws [Throwable] if the [url] is not a valid HEIC file, or the download fails.
      */
     public suspend fun fromUrl(
         url: String,
         urlLoader: UrlLoader? = null,
-    ): Bitmap? {
+    ): Bitmap {
         val loader = urlLoader ?: UrlLoader.Default()
         return fromInputStream(loader.download(url))
     }
 
     /**
      * Decode a HEIC [Uri] into a [Bitmap].
+     *
+     * @return Decoded [Bitmap].
+     * @throws [Throwable] if the [Uri] is not a valid HEIC file.
      */
-    public suspend fun fromUri(uri: Uri): Bitmap?
+    public suspend fun fromUri(uri: Uri): Bitmap
 
     /**
      * Used for extension functions.

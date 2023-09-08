@@ -17,7 +17,7 @@ import java.io.InputStream
 @RequiresApi(Build.VERSION_CODES.Q)
 internal class BitmapFactoryHeicDecoder(private val context: Context) : HeicDecoder {
 
-    override suspend fun fromByteArray(byteArray: ByteArray): Bitmap? {
+    override suspend fun fromByteArray(byteArray: ByteArray): Bitmap {
         val bitmapOptions = BitmapFactory.Options().apply {
             inJustDecodeBounds = true
         }
@@ -25,18 +25,19 @@ internal class BitmapFactoryHeicDecoder(private val context: Context) : HeicDeco
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size, bitmapOptions)
     }
 
-    override suspend fun fromFile(file: File): Bitmap? =
+    override suspend fun fromFile(file: File): Bitmap =
         BitmapFactory.decodeFile(file.absolutePath)
 
-    override suspend fun fromInputStream(stream: InputStream): Bitmap? =
+    override suspend fun fromInputStream(stream: InputStream): Bitmap =
         BitmapFactory.decodeStream(stream)
 
-    override suspend fun fromResources(resId: Int): Bitmap? =
+    override suspend fun fromResources(resId: Int): Bitmap =
         BitmapFactory.decodeResource(context.resources, resId)
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    override suspend fun fromUri(uri: Uri): Bitmap? = withContext(Dispatchers.IO) {
+    override suspend fun fromUri(uri: Uri): Bitmap = withContext(Dispatchers.IO) {
         context.contentResolver.openInputStream(uri)
             ?.use { inputStream -> fromInputStream(inputStream) }
+            ?: error("Can't open input stream for uri: $uri")
     }
 }
