@@ -71,7 +71,6 @@ public class GlideHeicDecoder(private val context: Context) : HeicDecoder {
     override suspend fun fromInputStream(
         stream: InputStream,
     ): Bitmap? = withContext(Dispatchers.IO) {
-        @Suppress("BlockingMethodInNonBlockingContext")
         val tempFile = File.createTempFile("glide_heic_download", ".heic", context.cacheDir)
         tempFile.outputStream().use { outputStream ->
             stream.copyTo(outputStream)
