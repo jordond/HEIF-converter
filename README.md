@@ -1,6 +1,7 @@
 # HEIF-converter
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/lincollincol/HEIF-converter)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/jordond/HEIF-converter)
+[![](https://jitpack.io/v/jordond/HEIF-converter.svg)](https://jitpack.io/#jordond/HEIF-converter)
 ![GitHub](https://img.shields.io/github/license/lincollincol/HEIF-converter)  
 ![GitHub followers](https://img.shields.io/github/followers/lincollincol?style=social)
 ![GitHub stars](https://img.shields.io/github/stars/lincollincol/HEIF-converter?style=social)
@@ -33,9 +34,10 @@ dependencies {
     def latest_version = "3.0.3"
 
     // Include everything
-    implementation("com.github.lincollincol:heif-converter:$latest_version")
+    implementation("com.github.jordond.HEIF-converter:decoder:$latest_version")
 
     // Or you can add them individually
+
 
     // Main library
     implementation("com.github.lincollincol:heif-converter:heifconverter:$latest_version")
